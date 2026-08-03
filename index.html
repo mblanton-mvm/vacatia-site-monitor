@@ -41,7 +41,11 @@
 .sm-note{font-size:11.5px;color:var(--dim);margin:-2px 0 0;background:var(--sunk);
  border-left:3px solid var(--gap);border-radius:6px;padding:7px 10px;line-height:1.45}
 .sm-tiles{display:flex;flex-direction:column;gap:8px}
-.sm-trow{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px}
+/* every tile the same width on every row: a FIXED column count, not auto-fit — auto-fit sized
+   each row to its own tile count, so the 4-tile row was wider than the 6-tile row */
+.sm-trow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media(min-width:560px){.sm-trow{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:900px){.sm-trow{grid-template-columns:repeat(6,minmax(0,1fr))}}
 .sm-tile{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 11px;
  display:flex;flex-direction:column;gap:2px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;
  min-height:60px}
@@ -84,36 +88,64 @@
 .sm-kv dd.bad{color:var(--dead)}.sm-kv dd.good{color:var(--live)}.sm-kv dd.warn{color:var(--gap)}
 .sm-cmt{font-size:12px;background:var(--sunk);border-radius:7px;padding:6px 9px;color:var(--ink)}
 .sm-tap{font-size:11px;color:var(--accent);font-weight:600}
-.cmp{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
-.cmp table{width:100%;border-collapse:collapse;min-width:820px}
+.cmp{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--panel)}
+/* table-layout:fixed with no per-column widths = every column exactly the same width */
+.cmp table{width:100%;border-collapse:collapse;min-width:1000px;table-layout:fixed}
 .cmp th{text-align:left;padding:5px 8px;background:var(--sunk);border-bottom:1px solid var(--line);
  font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);font-weight:650;white-space:nowrap;vertical-align:top}
 .cmp th span{display:block;text-transform:none;letter-spacing:0;font-weight:400;font-size:9.5px;color:var(--faint)}
-.cmp td{padding:5px 8px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap}
+/* wrap, never ellipsis: equal columns are worth having but not at the price of clipping a note
+   ("Stale MAC (randomised)" was being cut to "Stale MAC (randomis…") */
+.cmp td{padding:5px 8px;border-bottom:1px solid var(--line);font-size:11.5px;
+ white-space:normal;overflow-wrap:anywhere;vertical-align:top}
 .cmp td.m{font-family:var(--mono);font-size:11px}
 .cmp td.bad{color:var(--dead);font-weight:650}
 .cmp td.warn{color:var(--gap);font-weight:650}
 .cmp tr.mo td{background:color-mix(in srgb,var(--sunk) 60%,transparent)}
-.cmp tr.gh td{background:var(--sunk);border-top:2px solid var(--line);border-bottom:1px solid var(--line);
- font-family:var(--mono);font-weight:650;font-size:12.5px;color:var(--ink);padding:6px 8px}
-.cmp tr.gh:first-child td{border-top:0}
-.cmp tr.gh em{font-style:normal;font-family:var(--ui);font-size:9.5px;font-weight:650;color:var(--accent);
- text-transform:uppercase;letter-spacing:.06em;margin-left:9px}
+/* the side band. It used to be sunk-grey like the header row and vanished into the data —
+   now it is an accent band with a rule above it, so each side reads as its own block. */
+.cmp tr.gh td{background:var(--accent-soft);color:var(--accent);border-top:1px solid var(--accent);
+ border-bottom:1px solid var(--accent);font-family:var(--mono);font-weight:700;font-size:13px;
+ letter-spacing:.01em;padding:7px 8px}
+.cmp tr.gh em{font-style:normal;font-family:var(--ui);font-size:9px;font-weight:700;
+ background:var(--accent);color:var(--panel);text-transform:uppercase;letter-spacing:.07em;
+ margin-left:9px;padding:2px 6px;border-radius:99px;vertical-align:1px}
 .cmp .q{color:var(--faint);font-style:italic}
 .cmp tbody tr:last-child td{border-bottom:0}
-.sheet{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
-.sheet table{border-collapse:collapse;min-width:640px;width:100%}
-.sheet td{padding:5px 9px;border:1px solid var(--line);font-size:12px;white-space:nowrap;vertical-align:top}
-.sheet td.k{font-weight:650;color:var(--dim);background:var(--sunk);width:1%}
-.sheet td.hd{font-weight:650;text-decoration:underline}
-.sheet td.m,.sheet .m{font-family:var(--mono);font-size:11px}
-.sheet .ok{color:var(--live);font-weight:650}
-.sheet .bad,.sheet td.bad{color:var(--dead);font-weight:650}
-.sheet .warn,.sheet td.warn{color:var(--gap);font-weight:650}
-.sheet .miss{color:var(--accent);text-decoration:underline}
-.sheet .q{color:var(--faint)}
-.sheet tr.gaprow td{border:0;height:7px;padding:0;background:transparent}
-.sheet td.cmt{white-space:normal;font-style:italic;color:var(--ink);background:var(--sunk)}
+/* ---- drill: stacked sections, each an equal-width grid ---- */
+.dg{display:flex;flex-direction:column;gap:10px}
+.dsec{border:1px solid var(--line);border-radius:9px;background:var(--panel);overflow:hidden}
+.dsh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
+ padding:6px 10px;background:var(--sunk);border-bottom:1px solid var(--line);
+ font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:700}
+.dsh b{font-family:var(--mono);font-size:11px;text-transform:none;letter-spacing:0;
+ color:var(--dim);font-weight:400;text-align:right}
+.dsh b.warn{color:var(--gap);font-weight:650}
+/* gap:1px over a line-coloured background draws the hairlines between equal cells */
+.grid{display:grid;gap:1px;background:var(--line);
+ grid-template-columns:repeat(var(--n,4),minmax(0,1fr))}
+/* on a phone the 4-answer grids go 2-up, but the TV grid stacks 1-up: its panel count is odd as
+   often as not, and an empty grid area shows the hairline background as a phantom grey cell */
+@media(max-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .grid.tvg{grid-template-columns:minmax(0,1fr)}}
+.grid>div{background:var(--panel);padding:8px 10px;min-width:0}
+.grid .ch{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);
+ font-weight:700;margin-bottom:4px;line-height:1.3}
+.grid .cv{font-size:12.5px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+.grid .cm{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--dim);
+ line-height:1.4;overflow-wrap:anywhere}
+.grid .cv+.cv{margin-top:5px}
+.grid .cm+.cv{margin-top:5px}
+.grid .q{color:var(--faint);font-weight:400}
+.grid .ok{color:var(--live)} .grid .bad{color:var(--dead)} .grid .warn{color:var(--gap)}
+/* a position with no box: the panel itself goes red — this replaces the Missing Position row */
+.grid>div.miss{background:var(--dead-bg)}
+.grid>div.miss .ch{color:var(--dead)}
+.grid>div.miss .cv{color:var(--dead);font-weight:700;letter-spacing:.04em}
+.grid>div.allc{background:color-mix(in srgb,var(--sunk) 55%,transparent)}
+.dcmt{font-size:12px;font-style:italic;color:var(--ink);background:var(--sunk);
+ border-top:1px solid var(--line);padding:7px 10px;line-height:1.45}
+.dsec .sm-none{padding:9px 10px}
 .sm-card{cursor:pointer}
 .sm-empty{padding:26px 14px;text-align:center;color:var(--dim);font-size:13.5px;background:var(--panel);
  border:1px dashed var(--line);border-radius:10px}
@@ -287,9 +319,6 @@ function drill(s,r){
  const POSN={B:'Bedroom',L:'Livingroom',B1:'Bedroom 1',B2:'Bedroom 2'};
  // positions this unit expects, in bedroom-then-living order
  const order=['B','B1','B2','L'].filter(p=>(r[R.posOrder]||[]).includes(p));
- const cell=(p,which)=>{const d=(r[R.pos]||{})[p];
-   if(!d) return which==='icx'?'<span class="miss">Missing</span>':'';
-   return which==='icx'?esc(d[0]):`<span class="m">${esc(mac(d[1]))}</span>`};
  const unl=r[R.unlab]||[];
  // Last column = EVERY iCX box this room reports, not just the unlabelled ones. Built from the
  // lockout detail rows so a box in a position the roster never expected (a duplicate @B, a
@@ -304,37 +333,49 @@ function drill(s,r){
    :qr==='LIVING_ONLY'?'<span class="bad">Livingroom only</span>':'<span class="q">not recorded</span>';
  const nvBad=/NO NAME|ONE TV|DISAGREE|WRONG|WHILE VACANT/i.test(pk[P.nv]||'');
  const corr=(r[R.det]||[]).map(t=>t[T.corr]).filter(Boolean)[0]||'';
- const R1=`<tr><td class="k">TV</td>`+order.map(p=>`<td class="hd">${POSN[p]||p}</td>`).join('')
-   +`<td class="hd">All ICX Data</td></tr>`;
- const R2=`<tr><td class="k">ICX</td>`+order.map(p=>`<td>${cell(p,'icx')}</td>`).join('')
-   +`<td>${all.map(u=>esc(u[0])).join('<br>')||'<span class="q">—</span>'}</td></tr>`;
- const R3=`<tr><td class="k">MAC ID</td>`+order.map(p=>`<td>${cell(p,'mac')}</td>`).join('')
-   +`<td class="m">${all.map(u=>esc(mac(u[1]))).join('<br>')||'<span class="q">—</span>'}</td></tr>`;
- const span=order.length+2;
- const gap=`<tr class="gaprow"><td colspan="${span}"></td></tr>`;
- const miss=(r[R.miss]||[]).map(m=>POSN[m]||m).join(', ');
- return `<div class="sheet"><table>
-  ${R1}${R2}${R3}${gap}
-  <tr><td class="k">Missing Position</td><td class="${miss?'bad':''}">${esc(miss)||'none'}</td>
-      <td colspan="${Math.max(1,span-2)}" class="warn">${esc(corr)}</td></tr>
-  ${gap}
-  <tr><td class="k">PUNCHLIST DATA</td><td colspan="${span-1}" class="m">${
-      pk[P.done]?esc(new Date(pk[P.done]).toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT')
-        +(inWin(r)?'':` <span class="bad">&mdash; swept before the @ separator was found
-          (${PUNCH_FROM}), so the four answers below are NOT counted in the figures at the top</span>`)
-      :reswept(r)?'<span class="warn">Completed &mdash; no timestamp recorded</span>'
-      :'<span class="bad">Not completed</span>'}</td></tr>
-  <tr><td class="k">Casting QR seen on</td><td>${qrTxt}</td>
-      <td class="k">Use device MAC confirmed</td><td>${yn(pk[P.devmac])}</td>
-      <td class="k">Firmware</td><td>${yn(pk[P.fw])}</td>
-      <td class="k">Live linear</td><td>${LTV(pk[P.linear])}</td></tr>
-  ${pk[P.comment]?`<tr><td class="k">Tech comment</td><td colspan="${span-1}" class="cmt">&ldquo;${esc(pk[P.comment])}&rdquo;</td></tr>`:''}
-  <tr><td class="k">Guest Name</td><td>${esc((WITHNAMES&&pk[P.gname])||pk[P.init]||(pk[P.occ]||'').replace(/^./,c=>c.toUpperCase()))||'<span class="q">—</span>'}</td>
-      <td class="hd">Bedroom Displayed</td><td>${esc((WITHNAMES&&pk[P.bname])||pk[P.bed]||'')}</td>
-      <td class="hd">Livingroom Displayed</td><td>${esc((WITHNAMES&&pk[P.lname])||pk[P.liv]||'')}</td>
-      <td class="hd">Verdict</td><td class="${nvBad?'bad':'warn'}">${esc(NV[pk[P.nv]]?NV[pk[P.nv]][1]:(pk[P.nv]||''))}</td></tr>
- </table></div>
- <div><div class="sm-sec">iCX &middot; RMMS &middot; mDNS &mdash; lockout ${esc(r[R.lock]||r[R.room])} (all sides)</div>${cmpTable(s,r)}</div>`}
+ // ---- section 1: one equal-width panel per TV position, + All ICX Data ----
+ // A missing position is called out by the panel itself going red, which is why the old
+ // missing-position summary row is gone. (Keep double-quoted Capitalised pairs out of these
+ // comments — the PII gate in refresh.sh reads them as a name and blocks the publish.)
+ const tv=order.map(p=>{const d=(r[R.pos]||{})[p];
+   return `<div class="${d?'':'miss'}"><div class="ch">${POSN[p]||p}</div>`
+     +(d?`<div class="cv">${esc(d[0])}</div><div class="cm">${esc(mac(d[1]))}</div>`
+        :`<div class="cv">MISSING</div><div class="cm">&mdash;</div>`)+`</div>`}).join('')
+   +`<div class="allc"><div class="ch">All ICX Data</div>`
+   +(all.length?all.map(u=>`<div class="cv">${esc(u[0])}</div>
+       <div class="cm">${esc(mac(u[1]))}</div>`).join('')
+     :`<div class="cv q">&mdash;</div>`)+`</div>`;
+ // ---- section 2: the field sweep, four answers straight across ----
+ const sweep=[['Casting QR seen on',qrTxt],['Use device MAC',yn(pk[P.devmac])],
+   ['Firmware',yn(pk[P.fw])],['Live linear',LTV(pk[P.linear])]]
+   .map(([k,v])=>`<div><div class="ch">${k}</div><div class="cv">${v}</div></div>`).join('');
+ const stamp=pk[P.done]
+   ? esc(new Date(pk[P.done]).toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT')
+     +(inWin(r)?'':` <span class="bad">&mdash; before the @ separator (${PUNCH_FROM}); these four
+        answers are NOT in the figures at the top</span>`)
+   : reswept(r)?'<span class="warn">completed, no timestamp</span>'
+   :'<span class="bad">not completed</span>';
+ // ---- section 3: the on-screen name check ----
+ const names=[['Guest',esc((WITHNAMES&&pk[P.gname])||pk[P.init]
+     ||(pk[P.occ]||'').replace(/^./,c=>c.toUpperCase()))||'<span class="q">&mdash;</span>'],
+   ['Bedroom shows',esc((WITHNAMES&&pk[P.bname])||pk[P.bed]||'')||'<span class="q">&mdash;</span>'],
+   ['Livingroom shows',esc((WITHNAMES&&pk[P.lname])||pk[P.liv]||'')||'<span class="q">&mdash;</span>'],
+   ['Verdict',`<span class="${nvBad?'bad':'warn'}">${esc(NV[pk[P.nv]]?NV[pk[P.nv]][1]:(pk[P.nv]||''))
+     ||'<span class="q">&mdash;</span>'}</span>`]]
+   .map(([k,v])=>`<div><div class="ch">${k}</div><div class="cv">${v}</div></div>`).join('');
+ return `<div class="dg">
+  <div class="dsec"><div class="dsh"><span>TVs in this room</span>${
+     corr?`<b class="warn">${esc(corr)}</b>`:''}</div>
+   <div class="grid tvg" style="--n:${order.length+1}">${tv}</div></div>
+  <div class="dsec"><div class="dsh"><span>Field sweep</span><b>${stamp}</b></div>
+   <div class="grid" style="--n:4">${sweep}</div>${
+   pk[P.comment]?`<div class="dcmt">&ldquo;${esc(pk[P.comment])}&rdquo;</div>`:''}</div>
+  <div class="dsec"><div class="dsh"><span>On-screen name check</span></div>
+   <div class="grid" style="--n:4">${names}</div></div>
+  <div class="dsec"><div class="dsh"><span>iCX &middot; RMMS &middot; mDNS</span>
+    <b>lockout ${esc(r[R.lock]||r[R.room])} &middot; all sides</b></div>
+   ${cmpTable(s,r)}</div>
+ </div>`}
 
 function cmpTable(s,r){
  const D2=r[R.det]||[];
