@@ -25,11 +25,6 @@
 .sm-hd p .ok{color:var(--live);font-weight:650}
 .sm-hd p .warn{color:var(--gap);font-weight:650}
 .sm-hd p .bad{color:var(--dead);font-weight:650}
-.wbar{border-radius:9px;padding:9px 12px;font-size:12.5px;line-height:1.5;
- display:flex;flex-direction:column;gap:6px}
-.wbar.warn{background:var(--gap-bg);border:1px solid var(--gap);color:var(--ink)}
-.wbar.bad{background:var(--dead-bg);border:1px solid var(--dead);color:var(--ink)}
-.wbar b{font-weight:700}
 .sm-body{padding:12px 14px 40px;max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:13px}
 .sm-sites{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .sm-site{flex:0 0 auto;min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:10px;
@@ -38,16 +33,16 @@
 .sm-site small.cnt{font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums}
 .sm-site[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .sm-site:focus-visible,.sm-tile:focus-visible,.sm-f:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.sm-stale{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12.5px}
-.srcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:6px 16px}
-.src{display:flex;flex-direction:column;gap:1px;line-height:1.35}
-.src b{font-size:11.5px}
-.src span{font-size:11.5px;font-weight:650}
-.src span.ok{color:var(--live)} .src span.warn{color:var(--gap)} .src span.bad{color:var(--dead)}
-.src span.q{color:var(--faint);font-weight:400;font-family:var(--mono);font-size:10.5px}
 .sm-hint{font-size:11.5px;color:var(--faint);margin:-4px 0 0}
-.sm-note{font-size:11.5px;color:var(--dim);margin:-2px 0 0;background:var(--sunk);
- border-left:3px solid var(--gap);border-radius:6px;padding:7px 10px;line-height:1.45}
+.seg{display:flex;gap:6px}
+.seg:empty{display:none}
+.seg button{flex:1 1 0;min-height:40px;padding:5px 12px;border:1px solid var(--line);
+ border-radius:9px;background:var(--panel);color:var(--dim);font:inherit;font-size:12px;
+ font-weight:650;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.seg button b{font-size:15px;color:var(--ink)}
+.seg button[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);
+ color:var(--accent)}
+.seg button[aria-pressed=true] b{color:var(--accent)}
 .sm-tiles{display:flex;flex-direction:column;gap:8px}
 /* every tile the same width on every row: a FIXED column count, not auto-fit — auto-fit sized
    each row to its own tile count, so the 4-tile row was wider than the 6-tile row */
@@ -217,6 +212,7 @@
   linear-gradient(135deg,var(--faint) 50%,transparent 50%);
  background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;
  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:26px}
+.cmtc:not([data-has="Yes"]) input.aii{display:none}
 .aif{font-size:10.5px;color:var(--dim);background:var(--sunk);border-top:1px solid var(--line);
  padding:6px 10px;line-height:1.4}
 .syn{font-size:11.5px;font-weight:650}
@@ -271,22 +267,15 @@ h2.sm-h+p{margin:0;font-size:12.5px;color:var(--dim)}
  <div class="sm-hd"><h1>Vacatia Site Monitor</h1><p id="smStamp"></p></div>
  <div class="sm-body">
   <div class="sm-sites" id="smSites" role="group" aria-label="Site"></div>
-  <div id="smWarn"></div>
-  <div class="sm-stale" id="smStale"></div>
+  <div class="seg" id="smSeg" role="group" aria-label="Punchlist status"></div>
   <div class="sm-tiles" id="smTiles" role="group" aria-label="Filter by issue"></div>
   <p class="sm-hint">Tap any figure above to filter the list. Tap it again to clear.</p>
-  <p class="sm-note">The four punchlist figures &mdash; <b>QR missing on a TV</b>, <b>occupied no name</b>, <b>name on
-  1 TV only</b>, <b>name while vacant</b> &mdash; count only rooms whose punchlist was completed
-  <b>on or after 2026-07-31</b>, the day the HTVC <b>@ separator</b> was found. Rooms swept 7/29&ndash;7/30
-  were relabeled without the decorator, so their answers describe a labeling that no longer
-  exists. A room with no completion timestamp cannot be dated and is not counted.</p>
   <div class="sm-row">
    <input class="sm-f" type="search" id="smQ" placeholder="Room, lockout, Ethernet MAC or Wi-Fi MAC" aria-label="Search">
    <select class="sm-f" id="smG" aria-label="Group"></select>
   </div>
   <div class="sm-count"><span id="smCount"></span><span class="syn" id="smSync"></span>
    <button type="button" id="smCsv">Download this list</button>
-   <button type="button" id="smDone" style="display:none"></button>
    <button type="button" id="smAll">Open all in this list</button>
    <button type="button" id="smAiCsv">Download work orders</button>
    <button type="button" id="smPrint">Print work order</button>
@@ -361,7 +350,12 @@ const inWin=r=>{const d=ptDay((r[R.pk]||[])[P.done]); return !!d&&d>=PUNCH_FROM}
 // each tile declares the predicate it filters by; rows match the deck Michele laid out
 const TILES=s=>[[
  {k:'',      c:'',    n:s.boxesSeenOverall,  l:'boxes seen (all polls)'},
- {k:'',      c:'',    n:s.boxesSeenCurrent,  l:'boxes seen (this poll)'},
+ // ROSTER-SCOPED, not s.boxesSeenCurrent. That counter is every row in the newest export, orphan
+ // devices included, while never-seen / not-seen-now count only boxes belonging to roster rooms.
+ // Mixing the two populations made the tiles un-subtractable: at MVM783 the displayed figure sat
+ // 27 devices above the roster count and 4512-4350 came out at 162 against a real 189.
+ {k:'',      c:'',    n:sum(s,r=>r[R.devs].filter(d=>d[Dv.cur]).length),
+  l:'boxes seen (this poll)'},
  // the complement of the row-3 "boxes not in casting registry" tile: devices whose CURRENT real
  // MAC is present in the mDNS registry (DCAST index 0). Registry presence is necessary but not
  // sufficient for a guest to actually cast.
@@ -630,7 +624,7 @@ function actionItems(r,order,POSN){
      <td>${fld(key(p,'orig',id),kind)}</td>
      <td>${fld(key(p,'rev',id),kind)}</td></tr>`).join('')}
    <tr><td>Comments</td><td>${sel(key(p,'hascomment'),['Yes','No'])}</td>
-       <td>${ti(key(p,'comments'))}</td></tr>
+       <td class="cmtc" data-has="${esc(aiGet(key(p,'hascomment')))}">${ti(key(p,'comments'))}</td></tr>
    </tbody></table></div>`;
  // The list is not re-rendered while you type — a room vanishing mid-entry would be worse than a
  // stale list — so a finished sheet says so here and drops off the next time the list redraws.
@@ -735,22 +729,15 @@ function render(){
  const ago=m=>m==null?'unknown age':m<1?'just now':m<90?`${Math.round(m)} min old`
    :`${(m/60).toFixed(1)} h old`;
  const cls=(m,w,b)=>m==null?'bad':m>b?'bad':m>w?'warn':'ok';
+ // One freshness line, in the header. This replaced both a red warning bar and the three-column
+ // per-source panel that used to sit above the tiles — all three said the same thing three times.
+ // The punch age is folded in here so nothing was lost when those went.
+ const punchSrc=srcOf('Punch list (field sweep)'), punchAge=mins(punchSrc.captured_utc);
  $('smStamp').innerHTML=`${site} &middot; iCX labels as of <b>${esc((icxSrc.captured_at||'—')
    .slice(11,16))} ET</b> <span class="${cls(icxAge,ICX_WARN,ICX_BAD)}">(${ago(icxAge)})</span>
-   &middot; casting registry <span class="${cls(regAge,REG_WARN,REG_BAD)}">${ago(regAge)}</span>`;
- // Loud, and only when it matters. A snapshot is always "as of" something; what must never happen
- // is the page looking current while a tech is relabeling rooms it cannot see yet.
- const warn=[];
- if(icxAge==null||icxAge>ICX_WARN) warn.push(`<b>iCX labels and presence are ${ago(icxAge)}</b>
-   (captured ${esc((icxSrc.captured_at||'—').slice(11,16))} ET). A room worked since then still
-   shows its OLD label here &mdash; re-pull the per-device Online-STBs export for ${site} before
-   trusting a labeling verdict.`);
- if(regAge==null||regAge>REG_WARN) warn.push(`<b>The casting registry is ${ago(regAge)}</b>
-   (captured ${esc(regSrc.captured_at||'—')}). Every casting figure describes that snapshot. The
-   appliance collector writes it &mdash; pulling from staging more often cannot make it fresher.`);
- $('smWarn').innerHTML=warn.length
-   ?`<div class="wbar ${(icxAge>ICX_BAD||regAge>REG_BAD||icxAge==null)?'bad':'warn'}">${
-      warn.map(w=>`<div>${w}</div>`).join('')}</div>`:'';
+   &middot; casting registry <span class="${cls(regAge,REG_WARN,REG_BAD)}">${ago(regAge)}</span>
+   <span class="q">(${esc(regSrc.captured_at||'—')}, ${(s.regRows||0)} rows)</span>
+   &middot; punch list <span class="${cls(punchAge,720,2880)}">${ago(punchAge)}</span>`;
  $('smSites').innerHTML=Object.entries(D.sites).map(([k,v])=>
   `<button class="sm-site" type="button" aria-pressed="${k===site}" data-s="${k}">${k}<small>${esc(v.name)}</small>
    <small class="cnt">${v.units} units &middot; ${v.boxesExpected} boxes expected</small></button>`).join('')
@@ -771,17 +758,6 @@ function render(){
  const nowMs=Date.parse(D.nowUtc||'')||Date.parse((D.now||'').replace(' ','T')+'Z')||Date.now();
  const ageOf=v=>{const t=Date.parse(String(v||''));
    if(!t) return null; return (nowMs-t)/3600000};
- $('smStale').innerHTML=`<div class="srcs">`+(s.sources||[]).map(src=>{
-   const h=ageOf(src.captured_utc);
-   const cls=src.captured_at===''?'bad':h===null?'':h>24?'bad':h>2?'warn':'ok';
-   // "now" is the newest iCX poll, so a feed written since then (a tech sweeping rooms right
-   // now) is legitimately ahead of it — that is fresh, not a negative age.
-   const age=src.captured_at===''?'NOT LOADED'
-     :h===null?'—':h<0.02?'just now':h<1?`${Math.round(h*60)} min old`
-     :h<48?`${h.toFixed(1)} h old`:`${(h/24).toFixed(1)} days old`;
-   return `<div class="src"><b>${esc(src.name)}</b>
-     <span class="${cls}">${age}</span>
-     <span class="q">${esc(src.captured_at||'')} · ${esc(src.detail)}</span></div>`}).join('')+`</div>`;
  $('smTiles').innerHTML=TILES(s).map(row=>`<div class="sm-trow">`+row.map(t=>
   `<button class="sm-tile ${t.c}" type="button" data-f="${t.k}"${t.k?` aria-pressed="${f===t.k}"`:''}>
    <b>${t.n}</b><span>${t.l}</span></button>`).join('')+`</div>`).join('');
@@ -798,10 +774,12 @@ function render(){
  const inJ=f==='jarran'||f==='jarrandone';
  if(inJ){if(!PULLED.has(site))pullNow(site); else setSync(DIRTY.size?'offline':'live')}
  else if($('smSync')){$('smSync').textContent='';$('smSync').className='syn q'}
- const jd=$('smDone');
- jd.style.display=inJ?'':'none';
- jd.textContent=f==='jarrandone'?`Back to ${cnt(s,PRED.jarran)} still to work`
-   :`Show ${cnt(s,PRED.jarrandone)} completed`;
+ // completed / not-completed is a FILTER on the punchlist, not a hidden toggle
+ $('smSeg').innerHTML=inJ?[['jarran','Still to work',cnt(s,PRED.jarran)],
+   ['jarrandone','Completed',cnt(s,PRED.jarrandone)]].map(([k,l,n])=>
+   `<button type="button" data-f="${k}" aria-pressed="${f===k}">${l}
+     <b>${n}</b></button>`).join(''):'';
+ $('smSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{f=b.dataset.f;render()});
  $('smCards').innerHTML=Rs.length?Rs.slice(0,400).map(r=>{const isOpen=open.has(r[R.room]);
   const pk=r[R.pk]||[], qr=QR[pk[P.qr]];
   return `<div class="sm-card s-${sev(r)}${isOpen?' open':''}" role="button" tabindex="0"
@@ -896,7 +874,15 @@ $('smCsv').onclick=()=>{const s=D.sites[site],Rs=rows();
 document.addEventListener('input',e=>{const t=e.target;
  if(t&&t.dataset&&t.dataset.ai)aiSet(t.dataset.ai,t.value)});
 document.addEventListener('change',e=>{const t=e.target;
- if(t&&t.dataset&&t.dataset.ai)aiSet(t.dataset.ai,t.value)});
+ if(!(t&&t.dataset&&t.dataset.ai))return;
+ aiSet(t.dataset.ai,t.value);
+ // Comments Yes opens the note field, No hides it AND clears it — a hidden leftover note would
+ // otherwise sit in a room that the completion rule counts as comment-free.
+ if(t.dataset.ai.endsWith('|hascomment')){
+  const cell=t.closest('tr')&&t.closest('tr').querySelector('.cmtc');
+  if(cell){cell.dataset.has=t.value;
+   if(t.value!=='Yes'){const inp=cell.querySelector('input.aii');
+    if(inp&&inp.value){inp.value='';aiSet(inp.dataset.ai,'')}}}}});
 
 $('smAiCsv').onclick=()=>{
  // one row per room+position, for every room that has anything filled in
@@ -926,7 +912,6 @@ $('smAll').onclick=()=>{const Rs=rows();
  else Rs.forEach(r=>open.add(r[R.room]));
  render()};
 $('smPrint').onclick=()=>{rows().forEach(r=>open.add(r[R.room]));render();window.print()};
-$('smDone').onclick=()=>{f=(f==='jarrandone')?'jarran':'jarrandone';render()};
 $('smReset').onclick=()=>{f=null;sk=null;$('smQ').value='';$('smG').value='';render()};
 $('smQ').addEventListener('input',render);$('smG').addEventListener('change',render);
 render();})();
