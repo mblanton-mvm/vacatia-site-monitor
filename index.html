@@ -22,6 +22,14 @@
 .sm-hd{background:var(--panel);border-bottom:1px solid var(--line);padding:12px 14px;position:sticky;top:0;z-index:20}
 .sm-hd h1{margin:0;font-size:15px;font-weight:650}
 .sm-hd p{margin:3px 0 0;font-size:12px;color:var(--dim)}
+.sm-hd p .ok{color:var(--live);font-weight:650}
+.sm-hd p .warn{color:var(--gap);font-weight:650}
+.sm-hd p .bad{color:var(--dead);font-weight:650}
+.wbar{border-radius:9px;padding:9px 12px;font-size:12.5px;line-height:1.5;
+ display:flex;flex-direction:column;gap:6px}
+.wbar.warn{background:var(--gap-bg);border:1px solid var(--gap);color:var(--ink)}
+.wbar.bad{background:var(--dead-bg);border:1px solid var(--dead);color:var(--ink)}
+.wbar b{font-weight:700}
 .sm-body{padding:12px 14px 40px;max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:13px}
 .sm-sites{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .sm-site{flex:0 0 auto;min-height:44px;padding:6px 14px;border:1px solid var(--line);border-radius:10px;
@@ -246,6 +254,7 @@ h2.sm-h+p{margin:0;font-size:12.5px;color:var(--dim)}
  <div class="sm-hd"><h1>Vacatia Site Monitor</h1><p id="smStamp"></p></div>
  <div class="sm-body">
   <div class="sm-sites" id="smSites" role="group" aria-label="Site"></div>
+  <div id="smWarn"></div>
   <div class="sm-stale" id="smStale"></div>
   <div class="sm-tiles" id="smTiles" role="group" aria-label="Filter by issue"></div>
   <p class="sm-hint">Tap any figure above to filter the list. Tap it again to clear.</p>
@@ -309,6 +318,10 @@ const TVN={matches_guest:['good','matches the checked-in guest'],
 const QR={BOTH:['good','both TVs'],BEDROOM_ONLY:['warn','bedroom only'],
  LIVING_ONLY:['warn','living room only'],NEITHER:['bad','neither TV']};
 let open=new Set();
+// Staleness thresholds, in minutes. iCX drives labels/presence and a tech can invalidate it in one
+// visit, so it goes loud fast; the registry is written by the appliance collector every few hours
+// at best, so its bar is set where "the collector is behind" starts rather than at its cadence.
+const ICX_WARN=20, ICX_BAD=45, REG_WARN=90, REG_BAD=240;
 // a click that must NOT collapse the room it happened inside
 const noToggle=e=>!!(e.target&&e.target.closest
  &&e.target.closest('input,select,textarea,button,label,option,.dsec.ai'));
@@ -636,9 +649,32 @@ function devLine(s,d){
 
 function render(){
  const s=D.sites[site];
- // every iCX clock on this page (this stamp, Last Seen) is the dashboard's own Eastern wall time
- $('smStamp').textContent='As of '+(D.now||'unknown')+' ET (iCX clock)'
-  +' · presence tested by room number, labeling checked separately';
+ // Per-SITE, never the global max. D.now is the newest iCX stamp across ALL THREE sites, so a site
+ // whose export is lagging silently borrowed another site's freshness — MVM743 read as current off
+ // 783's poll while its own labels were 53 min stale and a tech was actively relabeling rooms.
+ const srcOf=n=>(s.sources||[]).find(x=>x.name===n)||{};
+ const icxSrc=srcOf('iCX Online STBs'), regSrc=srcOf('mDNS casting registry');
+ const mins=v=>{const t=Date.parse(String(v||''));return t?(Date.now()-t)/60000:null};
+ const icxAge=mins(icxSrc.captured_utc), regAge=mins(regSrc.captured_utc);
+ const ago=m=>m==null?'unknown age':m<1?'just now':m<90?`${Math.round(m)} min old`
+   :`${(m/60).toFixed(1)} h old`;
+ const cls=(m,w,b)=>m==null?'bad':m>b?'bad':m>w?'warn':'ok';
+ $('smStamp').innerHTML=`${site} &middot; iCX labels as of <b>${esc((icxSrc.captured_at||'—')
+   .slice(11,16))} ET</b> <span class="${cls(icxAge,ICX_WARN,ICX_BAD)}">(${ago(icxAge)})</span>
+   &middot; casting registry <span class="${cls(regAge,REG_WARN,REG_BAD)}">${ago(regAge)}</span>`;
+ // Loud, and only when it matters. A snapshot is always "as of" something; what must never happen
+ // is the page looking current while a tech is relabeling rooms it cannot see yet.
+ const warn=[];
+ if(icxAge==null||icxAge>ICX_WARN) warn.push(`<b>iCX labels and presence are ${ago(icxAge)}</b>
+   (captured ${esc((icxSrc.captured_at||'—').slice(11,16))} ET). A room worked since then still
+   shows its OLD label here &mdash; re-pull the per-device Online-STBs export for ${site} before
+   trusting a labeling verdict.`);
+ if(regAge==null||regAge>REG_WARN) warn.push(`<b>The casting registry is ${ago(regAge)}</b>
+   (captured ${esc(regSrc.captured_at||'—')}). Every casting figure describes that snapshot. The
+   appliance collector writes it &mdash; pulling from staging more often cannot make it fresher.`);
+ $('smWarn').innerHTML=warn.length
+   ?`<div class="wbar ${(icxAge>ICX_BAD||regAge>REG_BAD||icxAge==null)?'bad':'warn'}">${
+      warn.map(w=>`<div>${w}</div>`).join('')}</div>`:'';
  $('smSites').innerHTML=Object.entries(D.sites).map(([k,v])=>
   `<button class="sm-site" type="button" aria-pressed="${k===site}" data-s="${k}">${k}<small>${esc(v.name)}</small>
    <small class="cnt">${v.units} units &middot; ${v.boxesExpected} boxes expected</small></button>`).join('')
