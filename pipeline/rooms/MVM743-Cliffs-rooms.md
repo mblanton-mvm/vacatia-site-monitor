@@ -1,10 +1,16 @@
 # MVM743 — The Cliffs — Rooms & TVs
 
+**Source:** property PMS room list (`Cliffs_Scans_10_06_10002.pdf`), transcribed 2026-08-03.
+The PMS sheet lists **bedrooms** per unit; this file lists **TVs**, which is what the platform
+keys on: **1 bedroom = 2 TVs** (Bedroom + Living), **2 bedrooms = 3 TVs** (Bedroom 1 + Bedroom 2 + Living).
+
 **Total units:** 176  |  **2-TV (1-bedroom):** 64  |  **3-TV (2-bedroom):** 112  |  **Total TVs:** 464
 
-_3 TVs = 2-bedroom unit (Bedroom 1 + Bedroom 2 + Living). 2 TVs = 1-bedroom (Bedroom + Living)._
+> Corrected 2026-08-03: rooms **1065–1068** and **2065–2068** were filed under Building A and
+> belong to **Building Q**, which was missing from this file entirely. Found by the sweep crew
+> and confirmed against the PMS sheet. Every other room, building and TV count was already right.
 
-## Building A (16 units — 4×2-TV, 12×3-TV)
+## Building A (8 units — 4×2-TV, 4×3-TV)
 
 | Room | # TVs | Type |
 |---|---|---|
@@ -12,18 +18,10 @@ _3 TVs = 2-bedroom unit (Bedroom 1 + Bedroom 2 + Living). 2 TVs = 1-bedroom (Bed
 | 1002 | 3 | 2-bedroom |
 | 1003 | 3 | 2-bedroom |
 | 1004 | 3 | 2-bedroom |
-| 1065 | 3 | 2-bedroom |
-| 1066 | 3 | 2-bedroom |
-| 1067 | 3 | 2-bedroom |
-| 1068 | 3 | 2-bedroom |
 | 2001 | 2 | 1-bedroom |
 | 2002 | 2 | 1-bedroom |
 | 2003 | 2 | 1-bedroom |
 | 2004 | 2 | 1-bedroom |
-| 2065 | 3 | 2-bedroom |
-| 2066 | 3 | 2-bedroom |
-| 2067 | 3 | 2-bedroom |
-| 2068 | 3 | 2-bedroom |
 
 ## Building B (8 units — 4×2-TV, 4×3-TV)
 
@@ -219,6 +217,19 @@ _3 TVs = 2-bedroom unit (Bedroom 1 + Bedroom 2 + Living). 2 TVs = 1-bedroom (Bed
 | 2062 | 3 | 2-bedroom |
 | 2063 | 3 | 2-bedroom |
 | 2064 | 3 | 2-bedroom |
+
+## Building Q (8 units — 0×2-TV, 8×3-TV)
+
+| Room | # TVs | Type |
+|---|---|---|
+| 1065 | 3 | 2-bedroom |
+| 1066 | 3 | 2-bedroom |
+| 1067 | 3 | 2-bedroom |
+| 1068 | 3 | 2-bedroom |
+| 2065 | 3 | 2-bedroom |
+| 2066 | 3 | 2-bedroom |
+| 2067 | 3 | 2-bedroom |
+| 2068 | 3 | 2-bedroom |
 
 ## Building R (8 units — 8×2-TV, 0×3-TV)
 
