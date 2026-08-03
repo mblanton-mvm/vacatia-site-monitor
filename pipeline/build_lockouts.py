@@ -142,16 +142,27 @@ def main():
     kv = lambda xs: dict(x.split('=', 1) for x in xs)
     regs, pj = kv(a.registry), kv(a.punchjson)
 
+    # Scoped to the current day per site, exactly like merge_rooms — otherwise the lockout tables
+    # would list boxes from months-old exports that the tallies above no longer count, and the two
+    # halves of the page would disagree about which boxes exist.
     seen = {}
+    loaded = []
     for d in a.icx_dir:
         for p in sorted(glob.glob(os.path.join(d, '*.csv'))):
             code, rows = load_icx(p)
-            if not code or code not in roster:
+            if not code or code not in roster or not rows:
                 continue
-            for r in rows:
-                k = (code, r['mac'])
-                if r['ts'] > seen.get(k, {}).get('ts', ''):
-                    seen[k] = {'ts': r['ts'], 'label': r['label']}
+            loaded.append((code, max(r['ts'] for r in rows), rows))
+    today = {}
+    for code, cap, _ in loaded:
+        today[code] = max(today.get(code, ''), cap[:10])
+    for code, cap, rows in loaded:
+        if cap[:10] != today[code]:
+            continue
+        for r in rows:
+            k = (code, r['mac'])
+            if r['ts'] > seen.get(k, {}).get('ts', ''):
+                seen[k] = {'ts': r['ts'], 'label': r['label']}
     now = max((v['ts'] for v in seen.values()), default='')
     days = lambda t: round((datetime.datetime.fromisoformat(now)
                             - datetime.datetime.fromisoformat(t)).total_seconds() / 86400, 2)

@@ -138,19 +138,40 @@ def main():
     # carry timestamps spread over the whole window, so "older than the newest stamp" would flag
     # boxes that were in fact present in the latest poll.
     poll_macs = collections.defaultdict(list)
+
+    # TODAY IS PATIENT ZERO. Every tally at the top of the view counts only captures from the
+    # CURRENT DAY, per site. The icx/ folder keeps months of exports — MVM743 reaches back to
+    # 2025-11-03 — and folding those into "boxes seen" counted long-gone boxes forever: it is why
+    # 743 reported 467 seen against 464 expected and a nonsensical "-3 missing". Scoped to today
+    # the figures answer the question actually being asked, and subtract the way you expect:
+    #     expected - seen today          = boxes never seen today
+    #     seen today - seen this poll    = boxes not seen this poll
+    # History is deliberately NOT scoped — build_history.py still replays every banked snapshot,
+    # because "when did this label change" needs the whole span.
+    loaded = []
     for d in a.icx_dir:
         for p in sorted(glob.glob(os.path.join(d, '*.csv'))):
             code, rows = load_icx(p)
-            if not code or code not in roster:
+            if not code or code not in roster or not rows:
                 continue
-            cap = max((r['ts'] for r in rows), default='')
-            snaps[code].append({'file': os.path.basename(p), 'captured_at': cap,
-                                'devices': len(rows)})
-            poll_macs[code].append((cap, {r['mac'] for r in rows}))
-            for r in rows:
-                k = (code, r['mac'])
-                if r['ts'] > seen.get(k, {}).get('ts', ''):
-                    seen[k] = {'ts': r['ts'], 'label': r['label']}
+            loaded.append((code, max(r['ts'] for r in rows), p, rows))
+    today = {}
+    for code, cap, _p, _rows in loaded:
+        today[code] = max(today.get(code, ''), cap[:10])
+    for code, cap, p, rows in loaded:
+        if cap[:10] != today[code]:
+            continue                      # an earlier day — out of scope for the tallies
+        snaps[code].append({'file': os.path.basename(p), 'captured_at': cap,
+                            'devices': len(rows)})
+        poll_macs[code].append((cap, {r['mac'] for r in rows}))
+        for r in rows:
+            k = (code, r['mac'])
+            if r['ts'] > seen.get(k, {}).get('ts', ''):
+                seen[k] = {'ts': r['ts'], 'label': r['label']}
+    for code in sorted(today):
+        kept = sum(1 for c, cap, _, _ in loaded if c == code and cap[:10] == today[code])
+        drop = sum(1 for c, _, _, _ in loaded if c == code) - kept
+        print(f"{code}: tallies scoped to {today[code]} — {kept} captures used, {drop} earlier ignored")
     latest_macs = {c: max(v, key=lambda x: x[0])[1] for c, v in poll_macs.items() if v}
     latest_poll = {c: max(v, key=lambda x: x[0])[0] for c, v in poll_macs.items() if v}
     now = max((s['captured_at'] for v in snaps.values() for s in v), default='')
