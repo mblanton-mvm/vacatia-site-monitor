@@ -194,6 +194,9 @@
  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:26px}
 .aif{font-size:10.5px;color:var(--dim);background:var(--sunk);border-top:1px solid var(--line);
  padding:6px 10px;line-height:1.4}
+.syn{font-size:11.5px;font-weight:650}
+.syn.ok{color:var(--live)} .syn.warn{color:var(--gap)} .syn.bad{color:var(--dead)}
+.syn.q{color:var(--faint)}
 @media(min-width:900px){.aii,.ais{font-size:13px;min-height:30px}}
 @media print{
  @page{margin:12mm}
@@ -255,7 +258,7 @@ h2.sm-h+p{margin:0;font-size:12.5px;color:var(--dim)}
    <input class="sm-f" type="search" id="smQ" placeholder="Room, lockout, Ethernet MAC or Wi-Fi MAC" aria-label="Search">
    <select class="sm-f" id="smG" aria-label="Group"></select>
   </div>
-  <div class="sm-count"><span id="smCount"></span>
+  <div class="sm-count"><span id="smCount"></span><span class="syn" id="smSync"></span>
    <button type="button" id="smCsv">Download this list</button>
    <button type="button" id="smAll">Open all in this list</button>
    <button type="button" id="smAiCsv">Download work orders</button>
@@ -467,7 +470,7 @@ function drill(s,r){
   <div class="dsec"><div class="dsh"><span>iCX &middot; RMMS &middot; mDNS</span>
     <b>lockout ${esc(r[R.lock]||r[R.room])} &middot; all sides</b></div>
    ${cmpTable(s,r)}</div>
-  ${PRED.jarran(r)?actionItems(r,order,POSN):''}
+  ${f==='jarran'&&PRED.jarran(r)?actionItems(r,order,POSN):''}
  </div>`}
 
 // ---- the field work order, only on rooms that qualify for Jarran's punchlist ----------------
@@ -476,13 +479,83 @@ function drill(s,r){
 // after the logs are pulled / app data cleared / box power-cycled. Seeding Original from the
 // 7/29-8/02 punch answers would be putting words in the tech's mouth about a different visit.
 //
-// Entries autosave to this browser's localStorage — this page has no backend, so unlike the
-// punch list there is NO cross-device sync. Use "Download work orders" to get the data out.
-let AI={};
-try{AI=JSON.parse(localStorage.getItem('mvmActionItems')||'{}')||{}}catch(e){AI={}}
-const aiGet=k=>AI[k]||'';
-const aiSet=(k,v)=>{if(v)AI[k]=v;else delete AI[k];
- try{localStorage.setItem('mvmActionItems',JSON.stringify(AI))}catch(e){}};
+// Entries sync live, the same way the punch lists do: the same Supabase project and the same
+// publishable key, upserting into `punch_rooms` under its own `property` namespace (MVM784 ->
+// "784ai"). Nothing else touches that namespace — every existing reader (the punch apps,
+// punch-alerts, punch-backup's per-table dump, this build's own punch pull) filters on
+// property=eq.784/783/743 — so the work orders ride along without a schema change and get picked
+// up by the nightly backup for free. A dedicated table would be tidier; it needs DDL, which the
+// publishable key cannot do.
+//
+// Conflict model is per-FIELD last-write-wins on a client timestamp, not per-row: two techs in
+// the same lockout editing different TVs must not overwrite each other, which a whole-row upsert
+// would do. localStorage is the offline buffer — edits are kept and replayed when signal returns.
+const SUPA='https://zhqyjmugyoqvztqqegis.supabase.co';
+const SUPA_KEY='sb_publishable_Ehu06hwE9_VJyT_ivtteyg_bmos1qeN';
+const AI_NS=c=>String(c).replace(/^MVM0*/,'')+'ai';
+const AI_LS='mvmActionItems';
+let AI={},REM={},DIRTY=new Set(),PULLED=new Set();
+try{AI=JSON.parse(localStorage.getItem(AI_LS)||'{}')||{}}catch(e){AI={}}
+// migrate the pre-sync format (bare strings, no timestamp) so nothing typed before today is lost
+Object.keys(AI).forEach(k=>{if(typeof AI[k]==='string')AI[k]={v:AI[k],t:1}});
+try{DIRTY=new Set(JSON.parse(localStorage.getItem(AI_LS+':dirty')||'[]'))}catch(e){}
+const aiSave=()=>{try{localStorage.setItem(AI_LS,JSON.stringify(AI));
+ localStorage.setItem(AI_LS+':dirty',JSON.stringify([...DIRTY]))}catch(e){}};
+const aiGet=k=>(AI[k]&&AI[k].v)||'';
+// a cleared field is stored as an empty value WITH a timestamp, never deleted — otherwise the
+// clear would never beat the old value on another device
+const aiSet=(k,v)=>{AI[k]={v:v||'',t:Date.now()};
+ const p=k.split('|');DIRTY.add(p[0]+'|'+p[1]);aiSave();queuePush()};
+
+let pushTimer=null,SYNC='idle';
+const setSync=s=>{SYNC=s;const el=$('smSync');if(!el)return;
+ const m={live:['ok','● Live — synced'],saving:['warn','Saving…'],
+  offline:['bad','● Offline — '+DIRTY.size+' room(s) queued'],idle:['q','']};
+ const [c,t]=m[s]||m.idle;el.className='syn '+c;el.textContent=t};
+const queuePush=()=>{clearTimeout(pushTimer);setSync('saving');pushTimer=setTimeout(pushNow,800)};
+
+function pushNow(){
+ if(!DIRTY.size){setSync('live');return}
+ const bySite={};
+ [...DIRTY].forEach(rk=>{const i=rk.indexOf('|');
+  (bySite[rk.slice(0,i)]=bySite[rk.slice(0,i)]||[]).push(rk.slice(i+1))});
+ Object.keys(bySite).forEach(st=>{
+  const rows=bySite[st].map(room=>{
+   // start from what the server last told us, then let newer local fields win — this is what
+   // keeps a concurrent editor's other fields intact through our write
+   const f=Object.assign({},REM[st+'|'+room]||{});
+   Object.keys(AI).forEach(k=>{const p=k.split('|');
+    if(p[0]===st&&p[1]===room){const fk=p.slice(2).join('|');
+     if(!f[fk]||(AI[k].t||0)>=(f[fk].t||0))f[fk]={v:AI[k].v,t:AI[k].t||0}}});
+   return {property:AI_NS(st),room_id:room,data:{f:f}}});
+  fetch(SUPA+'/rest/v1/punch_rooms',{method:'POST',
+   headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,
+    'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+   body:JSON.stringify(rows)}).then(res=>{
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    rows.forEach(r=>{REM[st+'|'+r.room_id]=r.data.f;DIRTY.delete(st+'|'+r.room_id)});
+    aiSave();setSync(DIRTY.size?'offline':'live')
+   }).catch(()=>setSync('offline'))})}
+
+function pullNow(st){
+ fetch(SUPA+'/rest/v1/punch_rooms?property=eq.'+AI_NS(st)+'&select=room_id,data',
+  {headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}})
+ .then(res=>{if(!res.ok)throw new Error('HTTP '+res.status);return res.json()})
+ .then(rows=>{const changed=[];
+  rows.forEach(r=>{const f=(r.data&&r.data.f)||{};REM[st+'|'+r.room_id]=f;
+   Object.keys(f).forEach(fk=>{const k=st+'|'+r.room_id+'|'+fk;
+    if((f[fk].t||0)>((AI[k]&&AI[k].t)||0)){AI[k]={v:f[fk].v,t:f[fk].t||0};changed.push(k)}})});
+  PULLED.add(st);
+  if(changed.length){aiSave();
+   // patch the inputs in place; a re-render would yank focus out from under whoever is typing
+   changed.forEach(k=>document.querySelectorAll('[data-ai]').forEach(el=>{
+    if(el.dataset.ai===k&&el!==document.activeElement)el.value=aiGet(k)}))}
+  setSync(DIRTY.size?'offline':'live')})
+ .catch(()=>setSync('offline'))}
+
+setInterval(()=>{if(document.querySelector('.dsec.ai'))pullNow(site)},12000);
+setInterval(()=>{if(DIRTY.size)pushNow()},15000);
+window.addEventListener('online',()=>{pushNow();pullNow(site)});
 const AIROWS=[['fw','Firmware','text'],['label','Box Label','text'],
  ['devmac','Use Device MAC',['Yes','No']],['wifi','WiFi Enabled',['Yes','No']],
  ['qr','Casting QR Code',['Yes','No']],
@@ -512,8 +585,8 @@ function actionItems(r,order,POSN){
   <div class="aip">${AICHECKS.map(([id,lbl,opts])=>
     `<div class="air"><span>${lbl}</span>${sel(key(id),opts)}</div>`).join('')}</div>
   ${order.map(block).join('')}
-  <div class="aif">Saved on this device as you type &mdash; not synced. Use
-   <b>Download work orders</b> to get it off the phone.</div></div>`}
+  <div class="aif">Syncs live to Supabase as you type, the same as the punch list &mdash; edits show
+   up for everyone on this list. Offline entries are kept and sent when signal returns.</div></div>`}
 
 function cmpTable(s,r){
  const D2=r[R.det]||[];
@@ -602,6 +675,10 @@ function render(){
  gs.value=cur;
  const Rs=rows();
  $('smCount').textContent=`${Rs.length} of ${s.units} units`+(f?` · filtered`:'');
+ // pull the shared work orders the first time this site's list is opened, then the 12s timer
+ // keeps it current for as long as a work order is on screen
+ if(f==='jarran'){if(!PULLED.has(site))pullNow(site); else setSync(DIRTY.size?'offline':'live')}
+ else if($('smSync')){$('smSync').textContent='';$('smSync').className='syn q'}
  $('smCards').innerHTML=Rs.length?Rs.slice(0,400).map(r=>{const isOpen=open.has(r[R.room]);
   const pk=r[R.pk]||[], qr=QR[pk[P.qr]];
   return `<div class="sm-card s-${sev(r)}${isOpen?' open':''}" role="button" tabindex="0"
