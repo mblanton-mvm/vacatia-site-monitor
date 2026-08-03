@@ -108,6 +108,58 @@ def analyse(handle, grp):
 
 
 A = {h: analyse(h, g) for h, _, _, g in SITES}
+
+# ── per-device signal enrichment: what the boxes looked like, not just that they dropped ──
+ANOM = '/Users/micheleblanton/Developer/mvm-platform/docs/vacatia/data-drops/icx-anomalies'
+
+
+def enrich(handle, grp):
+    """Per-device RSSI / disruption / availability lists, grouped the same way as the losses.
+
+    These come from the iCX net-stats per-bucket exports. Each is a SNAPSHOT at one moment,
+    not a series — the capture time is carried through and printed, because a snapshot taken
+    two hours before an event cannot speak to that event.
+
+    Load-bearing caveat: a box that is FULLY dark contributes no telemetry, so it cannot
+    appear in any of these lists. Absence from them is therefore not evidence of health.
+    """
+    out = []
+    for pat, label, unit in (
+            ('availability-warn-{h}-*.csv', 'Net availability degraded', 'seconds online of 900'),
+            ('disruption-warn-{h}-*.csv', 'Internet disruption elevated', 'disruption count'),
+            ('disruption-anomaly-{h}-*.csv', 'Internet disruption elevated', 'disruption count'),
+            ('rssi-warn-{h}-*.csv', 'RSSI anomalous', 'dBm'),
+            ('rssi-anomaly-{h}-*.csv', 'RSSI anomalous', 'dBm')):
+        g = sorted(glob.glob(os.path.join(ANOM, pat.format(h=handle))))
+        if not g:
+            continue
+        if any(e['label'] == label for e in out):   # prefer the first (newer) naming
+            continue
+        rows = list(csv.DictReader(open(g[-1], encoding='utf-8-sig')))
+        if not rows:
+            continue
+        key = next((k for k in rows[0] if any(t in k for t in
+                    ('RSSI', 'Disruption', 'Availability'))), None)
+        ts = re.search(r'(\d{8})T(\d{4})ET', g[-1])
+        vals = sorted(float(r[key]) for r in rows if r.get(key) and
+                      re.match(r'^-?[\d.]+$', r[key].strip()))
+        c = Counter(grp(r.get('Room Number') or '') for r in rows)
+        macs = {r['Device ID'].strip().lower() for r in rows if r.get('Device ID')}
+        sust = {d['device'] for d in A[handle]['sust']}
+        dark = {d['device'] for d in A[handle]['sust'] if d['worst']['trailing']}
+        out.append({
+            'label': label, 'unit': unit, 'n': len(rows),
+            'at': f'{ts.group(2)[:2]}:{ts.group(2)[2:]}' if ts else '?',
+            'lo': vals[0] if vals else None, 'hi': vals[-1] if vals else None,
+            'med': vals[len(vals) // 2] if vals else None,
+            'top': c.most_common(3), 'groups': len(c),
+            'sust_hit': len(sust & macs), 'sust_n': len(sust),
+            'dark_hit': len(dark & macs), 'dark_n': len(dark),
+        })
+    return out
+
+
+ENR = {h: enrich(h, g) for h, _, _, g in SITES}
 json.dump({h: {k: v for k, v in a.items() if k != 'group_totals'} for h, a in A.items()},
           open(os.path.join(HERE, 'dish-report-data.json'), 'w'), indent=1, default=str)
 
@@ -134,6 +186,23 @@ NARR = {
   'ask': ("Berkley is the site we would most like DISH's help on. The distributed shape means the "
           "next useful step is above the individual box — we are asking whether DISH sees anything "
           "property-wide at Berkley in the 14:14–15:00 ET window today."),
+  'why': [
+   ("The boxes that dropped are the same boxes iCX was already flagging for internet disruption. "
+    "Of the 18 devices still dark at the last poll, <strong>16 appear in the disruption list</strong>; "
+    "of the 10 that missed two or more consecutive polls, 8 do. That is not a coincidence of "
+    "sampling — the disruption list covers 467 of 763 boxes, but the overlap with the boxes that "
+    "actually went away is near-total."),
+   ("<strong>Signal strength is not the cause.</strong> Only 24 boxes property-wide are flagged "
+    "RSSI-anomalous, spread thinly across 15 different floors, and only one of them is a box that "
+    "dropped. Those 24 read −28 to −34 dBm, which is a box sitting <em>very close</em> to its access "
+    "point — unusually strong, not weak. Berkley's problem is not RF."),
+   ("<strong>Read:</strong> boxes across the whole tower are losing their network path while their "
+    "radio link stays healthy. Combined with the even floor-by-floor spread, that points upstream of "
+    "the access points — a shared gateway, uplink or WAN path serving the property. Confidence: "
+    "moderate. The disruption/outage overlap is strong, but our per-device snapshot is from 15:14 ET "
+    "and the deepest drop was 14:44 ET, so it is corroborating evidence rather than a measurement of "
+    "the event itself."),
+  ],
  },
  'MVM783': {
   'verdict': 'Buildings 1 and 11 degraded progressively, then collapsed',
@@ -159,9 +228,36 @@ NARR = {
     "have only missed a single poll so far and do not yet appear in the back-to-back table below. "
     "The 38 devices that do appear there are the earlier, slower phase of the same pattern."),
   ],
-  'ask': ("We would like DISH to look at buildings 1 and 11 at Grandview specifically, from 15:44 ET "
-          "onward. If there is a common uplink, controller or IDF serving those two buildings, that is "
-          "where we would start."),
+  'ask': ("We would like DISH to look at the <strong>wired path serving buildings 1 and 11</strong> at "
+          "Grandview — uplink, IDF switch or gateway — from 15:44 ET onward. Based on the evidence "
+          "below we would specifically <em>de-prioritise</em> the access points and RF in those "
+          "buildings, and we would not start with the set-top boxes themselves."),
+  'why': [
+   ("We pulled per-device telemetry at 17:23–17:29 ET, while the event was still running, and it "
+    "identifies the layer. Three independent signals, and they do not agree by accident:"),
+   ('<table class="why"><thead><tr><th>Signal</th><th class="n">Boxes flagged</th>'
+    '<th class="n">In buildings 1 &amp; 11</th><th class="n">Elsewhere</th></tr></thead><tbody>'
+    '<tr class="hi"><td>Net availability degraded</td><td class="n">132</td>'
+    '<td class="n"><strong>130 (98%)</strong></td><td class="n">2</td></tr>'
+    '<tr class="hi"><td>Internet disruption elevated</td><td class="n">235</td>'
+    '<td class="n"><strong>227 (97%)</strong></td><td class="n">8</td></tr>'
+    '<tr><td>RSSI anomalous (weak signal)</td><td class="n">135</td>'
+    '<td class="n">9 (7%)</td><td class="n">126</td></tr></tbody></table>'),
+   ("<strong>The two network signals land almost entirely inside buildings 1 and 11. The signal-"
+    "strength problem lands almost entirely outside them.</strong> The overlap between either "
+    "network signal and the RSSI list is three boxes out of hundreds. The 126 genuinely weak-signal "
+    "boxes — −36 to −77 dBm, in buildings 2, 3, 4, 5, 6, 8, 41, 42, 51 and 61 — are <em>staying "
+    "online</em> throughout."),
+   ("The degraded boxes in buildings 1 and 11 hold connectivity for only <strong>211 to 299 seconds "
+    "of each 900-second window</strong> — roughly a quarter to a third of the time. They are not "
+    "powered off and they are not out of radio range; they are reachable in bursts."),
+   ("<strong>Read: this is a wired/upstream fault serving buildings 1 and 11, not a wireless or "
+    "box-level one.</strong> Boxes with healthy radios cannot hold a network path, while boxes with "
+    "genuinely poor radios elsewhere on the property are unaffected. Confidence: high — three "
+    "signals, two spatial distributions that are near-mutually-exclusive, and telemetry captured "
+    "during the event rather than before it. We still cannot name the specific device, and we are "
+    "not guessing at one."),
+  ],
  },
  'MVM743': {
   'verdict': 'Stable; five boxes dark since 13:59 ET',
@@ -183,8 +279,24 @@ NARR = {
     "a box sitting very close to its access point — not weak signal. We mention it because the label "
     "invites the opposite reading."),
   ],
-  'ask': ("For Cliffs we are only asking about the five dark boxes listed below. The rest of the "
-          "property is behaving well and needs nothing from DISH today."),
+  'ask': ("For Cliffs we are only asking about the five dark boxes listed below — specifically whether "
+          "DISH can see anything for them beyond 13:59 ET, since from our side they simply stop. The "
+          "rest of the property is behaving well and needs nothing today."),
+  'why': [
+   ("<strong>We cannot tell you why these five went dark, and it is worth being precise about why "
+    "not.</strong> The per-device telemetry iCX exposes only covers boxes that are still reporting "
+    "something. A box that has gone fully dark contributes no rows at all — so its absence from the "
+    "signal-strength and disruption lists is not evidence that it was healthy. It is simply absence "
+    "of data. None of the five appears, which is exactly what a fully-dark box looks like and tells "
+    "us nothing either way."),
+   ("What we can say is that the property around them is sound. Only 20 boxes are RSSI-anomalous, and "
+    "those read −25 to −34 dBm — again <em>too strong</em> rather than weak. Elevated disruption "
+    "covers 69 boxes and does concentrate in two building groups, which is worth noting as a mild "
+    "localized pattern, but it does not include the five dark rooms."),
+   ("This is the one place where our method has a hard floor, and the reason we are asking rather "
+    "than concluding: the last thing we observed about these boxes is that they stopped. Anything "
+    "beyond that has to come from DISH's side."),
+  ],
  },
 }
 
@@ -260,6 +372,24 @@ for handle, name, glabel, _ in SITES:
   </div>
 
   {''.join(f'<p>{b}</p>' for b in n['body'])}
+
+  <h3>What the boxes looked like before they dropped
+      <span class="unit">— per-device telemetry</span></h3>
+  {''.join(b if b.lstrip().startswith('<table') else f'<p>{b}</p>' for b in n.get('why', []))}
+  {('<table class="enr"><thead><tr><th>Signal</th><th class="n">Boxes</th><th>Captured</th>'
+    '<th class="n">Range</th><th>Concentration</th>'
+    '<th class="n">Of the still-dark boxes</th></tr></thead><tbody>'
+    + ''.join(
+      f'<tr><td>{e["label"]}</td><td class="n">{e["n"]}</td><td class="w">{e["at"]} ET</td>'
+      f'<td class="n">{("%g → %g" % (e["lo"], e["hi"])) if e["lo"] is not None else "—"}</td>'
+      f'<td class="sm">{", ".join(f"{glabel[0]}{k} × {v}" for k, v in e["top"])} '
+      f'<span class="unit">(of {e["groups"]})</span></td>'
+      f'<td class="n">{e["dark_hit"]} of {e["dark_n"]}</td></tr>' for e in ENR[handle])
+    + '</tbody></table>'
+    + f'<p class="more">Ranges are in the signal\'s own unit '
+      f'({", ".join(dict((e["label"], e["unit"]) for e in ENR[handle]).values())}). '
+      f'Each row is a single snapshot at the time shown, not a series.</p>'
+   ) if ENR[handle] else '<p class="more">No per-device telemetry was captured at this site today.</p>'}
 
   <h3>Box count by polling window <span class="unit">(Eastern)</span></h3>
   <table class="tl">
@@ -341,6 +471,8 @@ HTML = f'''<meta charset="utf-8"><title>MVM — Vacatia daily polling report, {D
   .more {{ font-size:8.2pt; color:#6b665d; font-style:italic; }}
   .ask {{ margin-top:5mm; background:#f0f5f9; border-left:2.5px solid #1a5a8a;
           padding:3mm 4mm; font-size:9.2pt; }}
+  table.why td, table.enr td {{ font-size:8.5pt; }}
+  table.why tr.hi td {{ background:#fdf3ec; }}
   .foot {{ margin-top:7mm; padding-top:2.5mm; border-top:.5px solid #d6d2cb;
            font-size:7.8pt; color:#7a746a; }}
 </style>
@@ -360,9 +492,17 @@ attention.</p>
 
 <p><strong>The short version.</strong> The Grandview has a localized failure that is not subtle:
 buildings 1 and 11 degraded for four hours and then lost roughly two-thirds of their boxes in a
-single window, while every other building on the property lost nothing. The Berkley has a milder but
-genuinely site-wide instability with no spatial pattern. The Cliffs is healthy apart from five boxes
-that have been dark since early afternoon.</p>
+single window, while every other building on the property lost nothing. Per-device telemetry pulled
+during the event points at the <strong>wired path serving those two buildings, not the wireless</strong>
+— their radios are healthy while their connectivity is not. The Berkley shows the same
+network-layer signature but spread evenly across the whole tower rather than concentrated. The Cliffs
+is healthy apart from five boxes dark since early afternoon, and there we can tell you what we
+observed but not why.</p>
+
+<p><strong>What we are not claiming.</strong> We have identified, at each site, which layer the
+evidence points to. We have <em>not</em> identified a specific failing device, and nothing in this
+report should be read as naming one. Where we state a cause we give our confidence and the evidence
+it rests on; where the data runs out we say so rather than filling the gap.</p>
 
 <div class="method">
   <strong>Method and its limits, stated plainly.</strong> Each figure comes from the iCX
