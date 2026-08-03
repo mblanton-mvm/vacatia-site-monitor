@@ -35,6 +35,8 @@
 .src span.ok{color:var(--live)} .src span.warn{color:var(--gap)} .src span.bad{color:var(--dead)}
 .src span.q{color:var(--faint);font-weight:400;font-family:var(--mono);font-size:10.5px}
 .sm-hint{font-size:11.5px;color:var(--faint);margin:-4px 0 0}
+.sm-note{font-size:11.5px;color:var(--dim);margin:-2px 0 0;background:var(--sunk);
+ border-left:3px solid var(--gap);border-radius:6px;padding:7px 10px;line-height:1.45}
 .sm-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px}
 .sm-tile{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 11px;
  display:flex;flex-direction:column;gap:2px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;
@@ -138,6 +140,10 @@ h2.sm-h+p{margin:0;font-size:12.5px;color:var(--dim)}
   <div class="sm-stale" id="smStale"></div>
   <div class="sm-tiles" id="smTiles" role="group" aria-label="Filter by issue"></div>
   <p class="sm-hint">Tap any figure above to filter the list. Tap it again to clear.</p>
+  <p class="sm-note">Registry presence is <b>necessary but not sufficient</b> for casting — a box whose
+  real MAC is listed can still fail to show the pairing QR (measured at all three sites). This view
+  reports what the mDNS registry contains, not whether a guest can actually cast. Every figure is
+  stamped with the capture age of its own source above; sources are <b>not</b> uniformly fresh.</p>
   <div class="sm-row">
    <input class="sm-f" type="search" id="smQ" placeholder="Room, lockout, Ethernet MAC or Wi-Fi MAC" aria-label="Search">
    <select class="sm-f" id="smG" aria-label="Group"></select>
@@ -160,9 +166,9 @@ const PRES=['All boxes seen','Some boxes missing','No boxes seen','More boxes th
 const PSEV=['live','dead','dead','gap'];
 const LABL=['Labelled','Not relabelled','Partly labelled','Duplicate position','Wrong position','No boxes'];
 const LSEV=['live','gap','gap','dead','dead','dead'];
-const CAST=['All castable','Some cannot cast','None castable','No registry export'];
+const CAST=['Both in registry','Some not in registry','None in registry','No registry export'];
 const CSEV=['live','dead','dead','mute'];
-const DC=['castable','stranded on randomised MAC','no real MAC (leftover)','no registry entry','no registry export'];
+const DC=['real MAC in registry','stranded on randomised MAC','no real MAC (leftover present)','no registry entry','no registry export'];
 const R={room:0,grp:1,exp:2,seen:3,pres:4,labl:5,cast:6,miss:7,punch:8,devs:9,pk:10,det:11,lock:12,pos:13,posOrder:14,unlab:15};
 const T={lbl:0,eth:1,wifi:2,ts:3,mlbl:4,mmac:5,mip:6,note:7,corr:8};
 const Dv={mac:0,label:1,pos:2,ts:3,days:4,cast:5,real:6,left:7,stale:8};
@@ -200,7 +206,7 @@ const TILES=s=>[
  {k:'pres3', c:'gap', n:cnt(s,r=>r[R.pres]===3), l:'extra boxes'},
  {k:'notrel',c:'gap', n:cnt(s,r=>r[R.labl]===1), l:'not relabelled'},
  {k:'badlbl',c:'dead',n:cnt(s,r=>[2,3,4].includes(r[R.labl])), l:'label wrong'},
- {k:'nocast',c:'dead',n:s.devicesCannotCast, l:'cannot cast (boxes)'},
+ {k:'nocast',c:'dead',n:s.devicesCannotCast, l:'boxes not in casting registry'},
  {k:'',      c:'gap', n:s.staleBoxes,        l:'stale boxes (random MAC)'},
  {k:'noname',c:'dead',n:cnt(s,r=>(r[R.pk]||[])[P.nv]==='NO_NAME_ON_EITHER_TV'), l:'occupied, no name'},
  {k:'onename',c:'dead',n:cnt(s,r=>(r[R.pk]||[])[P.nv]==='NAME_ON_ONE_TV_ONLY'), l:'name on 1 TV only'},
