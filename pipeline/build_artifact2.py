@@ -458,13 +458,15 @@ const inWin=r=>{const d=ptDay((r[R.pk]||[])[P.done]); return !!d&&d>=PUNCH_FROM}
 
 // each tile declares the predicate it filters by; rows match the deck Michele laid out
 const TILES=s=>[[
- {k:'',      c:'',    n:s.boxesSeenOverall,  l:'boxes seen (all polls)'},
+ // everything here counts TODAY only (merge_rooms scopes the captures), so the whole deck
+ // subtracts against "boxes expected" on the site button and nothing needs a mental correction.
+ {k:'',      c:'',    n:s.boxesSeenOverall,  l:'boxes seen today'},
  // ROSTER-SCOPED, not s.boxesSeenCurrent. That counter is every row in the newest export, orphan
  // devices included, while never-seen / not-seen-now count only boxes belonging to roster rooms.
  // Mixing the two populations made the tiles un-subtractable: at MVM783 the displayed figure sat
  // 27 devices above the roster count and 4512-4350 came out at 162 against a real 189.
  {k:'',      c:'',    n:sum(s,r=>r[R.devs].filter(d=>d[Dv.cur]).length),
-  l:'boxes seen (this poll)'},
+  l:'boxes seen this poll'},
  // the complement of the row-3 "boxes not in casting registry" tile: devices whose CURRENT real
  // MAC is present in the mDNS registry (DCAST index 0). Registry presence is necessary but not
  // sufficient for a guest to actually cast.
@@ -477,13 +479,17 @@ const TILES=s=>[[
  // NEVER reported in any poll is an install/inventory problem; a box that HAS reported before but
  // was absent from the latest poll is dark right now. Both are room-derived, so neither can go
  // negative the way the old site-level (expected - seen) did (MVM743 read "-3").
- // NOTE these two will NOT reconcile against "boxes seen (all polls)" minus "boxes seen (this
- // poll)". Those two counters include ORPHAN devices — boxes reporting a room the roster does not
- // have — while never/not-seen are roster-room populations only. Verified 2026-08-03: the residual
- // equals the orphan devices present in the latest poll at all three sites (784 7 of 8, 783 26 of
- // 28, 743 6 of 9). Different denominators, not a bug.
- {k:'never', c:sum(s,r=>r[R.never])>0?'dead':'', n:sum(s,r=>r[R.never]), l:'never seen'},
- {k:'notnow',c:sum(s,r=>r[R.notnow])>0?'dead':'', n:sum(s,r=>r[R.notnow]),
+ // BOTH measured against BOXES EXPECTED, which is how these get read in practice:
+ //   expected - seen today      = never reported at all today
+ //   expected - seen this poll  = not reporting right now (a superset: it includes the never-seen)
+ // Deliberately plain site-level subtraction, not a per-room sum. Scoped to today the union can no
+ // longer exceed expected, so the clamping that used to be needed only made the tiles disagree
+ // with the arithmetic anyone does in their head. Rooms holding MORE boxes than the roster expects
+ // are surfaced by the "extra boxes" tile instead of quietly inflating these.
+ {k:'never', c:Math.max(0,s.boxesExpected-s.boxesSeenOverall)>0?'dead':'',
+  n:Math.max(0,s.boxesExpected-s.boxesSeenOverall), l:'never seen today'},
+ {k:'notnow',c:Math.max(0,s.boxesExpected-sum(s,r=>r[R.devs].filter(d=>d[Dv.cur]).length))>0?'dead':'',
+  n:Math.max(0,s.boxesExpected-sum(s,r=>r[R.devs].filter(d=>d[Dv.cur]).length)),
   l:'not seen this poll'},
  {k:'pres2', c:'dead',n:cnt(s,r=>r[R.pres]===2), l:'no boxes at all'},
  {k:'pres3', c:'gap', n:cnt(s,r=>r[R.pres]===3), l:'extra boxes'},
@@ -502,8 +508,9 @@ function sum(s,f){return s.rooms.reduce((a,r)=>a+f(r),0)}
 const PRED={pres0:r=>r[R.pres]===0,pres1:r=>r[R.pres]===1,pres2:r=>r[R.pres]===2,
  pres3:r=>r[R.pres]===3,notrel:r=>r[R.labl]===1,badlbl:r=>[2,3,4].includes(r[R.labl]),
  // the tiles count BOXES; the filters show the rooms those boxes belong to
- never:r=>r[R.never]>0,
- notnow:r=>r[R.notnow]>0,
+ // the tiles count BOXES against expected; the filters show the ROOMS those boxes are short in
+ never:r=>r[R.seen]<r[R.exp],
+ notnow:r=>r[R.devs].filter(d=>d[Dv.cur]).length<r[R.exp],
  nocast:r=>r[R.devs].some(d=>d[Dv.cast]>=1&&d[Dv.cast]<=3),
  // the tile counts randomised REGISTRY ROWS; the filter shows the rooms carrying one —
  // either an mDNS-only randomised registration or a box stranded on a randomised MAC
