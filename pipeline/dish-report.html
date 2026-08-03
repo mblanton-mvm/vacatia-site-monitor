@@ -1,0 +1,206 @@
+<meta charset="utf-8"><title>MVM — Vacatia daily polling report, Monday 3 August 2026</title>
+<style>
+  @page { size: letter; margin: 14mm 13mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font: 10pt/1.5 "Charter","Iowan Old Style",Georgia,serif; color:#1b1b1b; margin:0; }
+  h1 { font: 600 21pt/1.2 "Helvetica Neue",Arial,sans-serif; margin:0 0 2mm; letter-spacing:-.2px; }
+  h2 { font: 600 15pt/1.2 "Helvetica Neue",Arial,sans-serif; margin:.5mm 0 1mm; }
+  h3 { font: 600 9pt/1.3 "Helvetica Neue",Arial,sans-serif; text-transform:uppercase;
+        letter-spacing:.9px; color:#4a4a4a; margin:7mm 0 2mm;
+        border-bottom:1px solid #d6d2cb; padding-bottom:1.5mm; }
+  .unit { text-transform:none; letter-spacing:0; font-weight:400; color:#8a8578; }
+  p { margin:0 0 2.6mm; }
+  .doc { border-bottom:2.5px solid #1a3f5c; padding-bottom:3mm; margin-bottom:5mm; }
+  .kicker { font:600 8.5pt/1 "Helvetica Neue",Arial,sans-serif; letter-spacing:1.6px;
+             text-transform:uppercase; color:#1a5a8a; margin-bottom:2.5mm; }
+  .sub { color:#5c5850; font-size:9.5pt; }
+  .method { background:#f6f4f0; border-left:2.5px solid #b9b2a6; padding:3mm 4mm;
+             font-size:8.8pt; line-height:1.55; margin:0 0 6mm; color:#3d3a34; }
+  .method strong { color:#1b1b1b; }
+  table { width:100%; border-collapse:collapse; font-size:8.6pt; margin-bottom:2mm; }
+  th { text-align:left; font:600 7.6pt/1.2 "Helvetica Neue",Arial,sans-serif;
+        text-transform:uppercase; letter-spacing:.6px; color:#5c5850;
+        border-bottom:1.2px solid #9a938a; padding:1.4mm 2mm; }
+  td { padding:1.3mm 2mm; border-bottom:.5px solid #e6e2db; vertical-align:top; }
+  .n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .w, .mono { font-family:"SF Mono",Menlo,monospace; font-size:8pt; white-space:nowrap; }
+  .sm { font-size:7.9pt; color:#5c5850; }
+  .neg { color:#8c2f13; } .pos { color:#2d5a3d; }
+  tr.hi td { background:#fdf3ec; }
+  tr.hi .neg { font-weight:700; }
+  .dark { color:#8c2f13; font-weight:600; }
+  .site { break-before:page; }
+  .sitehead { display:flex; justify-content:space-between; align-items:flex-start;
+               gap:8mm; border-bottom:1.5px solid #1a3f5c; padding-bottom:3mm; margin-bottom:4mm; }
+  .handle { font:600 8pt/1 "SF Mono",Menlo,monospace; color:#1a5a8a; letter-spacing:1px; }
+  .verdict { font:600 10pt/1.3 "Helvetica Neue",Arial,sans-serif; margin-top:1mm; }
+  .sitestat { text-align:right; flex:0 0 auto; }
+  .spark { display:block; margin-bottom:1mm; }
+  .statrow { font-size:8.2pt; color:#5c5850; }
+  .statrow span { font:600 9.5pt "Helvetica Neue",Arial,sans-serif; color:#1b1b1b;
+                   font-variant-numeric:tabular-nums; }
+  .statrow em { font-style:normal; margin-left:1.5mm; }
+  .pill { display:inline-block; margin-top:1.5mm; font:600 7.4pt "Helvetica Neue",Arial,sans-serif;
+           text-transform:uppercase; letter-spacing:.7px; color:#fff; background:var(--c);
+           padding:.9mm 2.4mm; border-radius:2px; }
+  .lead { font-size:9pt; color:#4a463f; }
+  .none { font-size:9pt; color:#2d5a3d; background:#f2f7f3; padding:2.5mm 3mm;
+           border-left:2.5px solid #2d5a3d; }
+  .more { font-size:8.2pt; color:#6b665d; font-style:italic; }
+  .ask { margin-top:5mm; background:#f0f5f9; border-left:2.5px solid #1a5a8a;
+          padding:3mm 4mm; font-size:9.2pt; }
+  .foot { margin-top:7mm; padding-top:2.5mm; border-top:.5px solid #d6d2cb;
+           font-size:7.8pt; color:#7a746a; }
+</style>
+
+<div class="doc">
+  <div class="kicker">MVM Technology · prepared for DISH Business</div>
+  <h1>Vacatia three-site set-top box polling report</h1>
+  <div class="sub">Monday 3 August 2026 · The Berkley, The Grandview and The Cliffs ·
+    Evolve M2 / OnStream fleet · compiled from DISH iCX</div>
+</div>
+
+<p><strong>Why you are getting this.</strong> MVM has been polling the iCX dashboard for all three
+Vacatia properties on a fifteen-minute cadence and keeping every per-device export, so we can tell
+the difference between a box that blinked and a box that is genuinely down. This report covers
+Monday 3 August 2026 and is written to give DISH the shortest path to the two things we think need
+attention.</p>
+
+<p><strong>The short version.</strong> The Grandview has a localized failure that is not subtle:
+buildings 1 and 11 degraded for four hours and then lost roughly two-thirds of their boxes in a
+single window, while every other building on the property lost nothing. The Berkley has a milder but
+genuinely site-wide instability with no spatial pattern. The Cliffs is healthy apart from five boxes
+that have been dark since early afternoon.</p>
+
+<div class="method">
+  <strong>Method and its limits, stated plainly.</strong> Each figure comes from the iCX
+  <em>Online STBs</em> per-device export, captured once per fifteen-minute window and retained.
+  A box counts as present in a window if iCX listed it; "lost" means it was in the previous export
+  and not the current one. Timestamps are the export's own, which are <strong>Eastern wall
+  clock</strong>. Two honest caveats: iCX aggregates in fifteen-minute windows, so a drop shorter
+  than that can pass unseen; and polls were not perfectly evenly spaced today, which is why the
+  tables give both the number of consecutive windows missed and the real elapsed minutes. Where we
+  offer a cause we say so and give our confidence — everything else is presented as observation.
+</div>
+
+<h3>All three sites at a glance</h3>
+<table>
+  <thead><tr><th>Site</th><th class="n">Online, last poll</th><th class="n">Polls</th>
+    <th class="n">Devices seen</th><th class="n">2+ poll outages</th>
+    <th class="n">Still dark</th></tr></thead>
+  <tbody><tr><td>MVM784</td><td class="n">763</td><td class="n">13</td><td class="n">781</td><td class="n">10</td><td class="n">3</td></tr><tr><td>MVM783</td><td class="n">4,093</td><td class="n">11</td><td class="n">4,369</td><td class="n">38</td><td class="n">25</td></tr><tr><td>MVM743</td><td class="n">457</td><td class="n">12</td><td class="n">463</td><td class="n">6</td><td class="n">5</td></tr></tbody>
+</table>
+<p class="lead" style="margin-top:2mm">"Devices seen" counts every distinct box that appeared in at
+least one poll today, which is why it can exceed the count in any single window. "Still dark" is a
+box that missed two or more consecutive polls and had not returned by the last one.</p>
+
+
+<section class="site">
+  <div class="sitehead">
+    <div>
+      <div class="handle">MVM784</div>
+      <h2>The Berkley Las Vegas</h2>
+      <div class="verdict" style="color:#8a6410">Site-wide intermittent drop-off, no spatial pattern</div>
+    </div>
+    <div class="sitestat">
+      <svg class="spark" viewBox="0 0 190 34" width="190" height="34"><path d="M0.0,5.4 L15.8,5.4 L31.7,5.9 L47.5,8.9 L63.3,16.3 L79.2,31.0 L95.0,19.7 L110.8,5.0 L126.7,8.5 L142.5,10.2 L158.3,5.9 L174.2,6.3 L190.0,9.8 L190,34 L0,34 Z" fill="rgba(20,70,120,.10)"/><path d="M0.0,5.4 L15.8,5.4 L31.7,5.9 L47.5,8.9 L63.3,16.3 L79.2,31.0 L95.0,19.7 L110.8,5.0 L126.7,8.5 L142.5,10.2 L158.3,5.9 L174.2,6.3 L190.0,9.8" fill="none" stroke="#1a5a8a" stroke-width="1.5"/><circle cx="190.0" cy="9.8" r="2.6" fill="#1a5a8a"/></svg>
+      <div class="statrow"><span>773</span><em>first poll</em></div>
+      <div class="statrow"><span>763</span><em>last poll</em></div>
+      <div class="statrow"><span>714–774</span><em>day range</em></div>
+      <span class="pill" style="--c:#8a6410">Worth a look</span>
+    </div>
+  </div>
+
+  <p>Berkley's box count moved within a 714–774 band across thirteen polls, a swing of 60 boxes (7.7% of the fleet). The deepest point was 14:44 ET at 714 online; it recovered to 774 by 15:29 ET without intervention and has held 763–772 since.</p><p>The losses are spread evenly across every floor in the tower — at the 14:44 ET trough the 61 missing boxes came from at least ten different floors, with no floor contributing more than eight. <strong>That argues against a single access point, switch or riser</strong> and points instead at something acting on the whole property at once. Confidence: high, on the basis that the same distributed shape repeats in every one of the thirteen polls.</p><p>Separately, iCX's own NET_DISRUPTION_COUNT flags 425 of 763 boxes (56%) as 'bad' in the 21:15 UTC window, and has stayed in the 132–652 range all day. We treat this counter as noisy and are not reporting it as a fault; we would welcome DISH's read on what threshold drives it, because at 56% of the fleet it is either telling us something real or it is not usable as a signal.</p>
+
+  <h3>Box count by polling window <span class="unit">(Eastern)</span></h3>
+  <table class="tl">
+    <thead><tr><th>Window</th><th class="n">Online</th><th class="n">Lost</th>
+      <th class="n">Returned</th><th>Where the losses were</th></tr></thead>
+    <tbody><tr class=""><td class="w">11:59</td><td class="n">773</td><td class="n neg">−5</td><td class="n pos">+5</td><td class="sm">f4 × 1, f7 × 1, f5 × 1, f16 × 1</td></tr><tr class=""><td class="w">12:14</td><td class="n">772</td><td class="n neg">−6</td><td class="n pos">+5</td><td class="sm">f9 × 1, f16 × 1, f11 × 1, f14 × 1</td></tr><tr class=""><td class="w">13:44</td><td class="n">765</td><td class="n neg">−13</td><td class="n pos">+6</td><td class="sm">f4 × 3, f15 × 2, f2 × 2, f8 × 2</td></tr><tr class=""><td class="w">14:14</td><td class="n">748</td><td class="n neg">−29</td><td class="n pos">+12</td><td class="sm">f17 × 4, f6 × 3, f3 × 3, f15 × 2</td></tr><tr class="hi"><td class="w">14:44</td><td class="n">714</td><td class="n neg">−61</td><td class="n pos">+27</td><td class="sm">f3 × 8, f6 × 7, f17 × 7, f16 × 6</td></tr><tr class="hi"><td class="w">14:59</td><td class="n">740</td><td class="n neg">−35</td><td class="n pos">+61</td><td class="sm">f7 × 4, f15 × 4, f3 × 3, f12 × 3</td></tr><tr class=""><td class="w">15:29</td><td class="n">774</td><td class="n neg">−4</td><td class="n pos">+38</td><td class="sm">f5 × 1, f9 × 1, f14 × 1, f4 × 1</td></tr><tr class=""><td class="w">15:59</td><td class="n">766</td><td class="n neg">−11</td><td class="n pos">+3</td><td class="sm">f8 × 2, f7 × 2, f12 × 1, f6 × 1</td></tr><tr class=""><td class="w">16:14</td><td class="n">762</td><td class="n neg">−15</td><td class="n pos">+11</td><td class="sm">f17 × 4, f16 × 3, f10 × 2, f5 × 2</td></tr><tr class=""><td class="w">16:29</td><td class="n">772</td><td class="n neg">−5</td><td class="n pos">+15</td><td class="sm">f14 × 1, f10 × 1, f4 × 1, f8 × 1</td></tr><tr class=""><td class="w">16:59</td><td class="n">771</td><td class="n neg">−9</td><td class="n pos">+8</td><td class="sm">f9 × 4, f11 × 1, f4 × 1, f12 × 1</td></tr><tr class=""><td class="w">17:14</td><td class="n">763</td><td class="n neg">−15</td><td class="n pos">+7</td><td class="sm">f6 × 3, f17 × 3, f10 × 3, f9 × 2</td></tr></tbody>
+  </table>
+
+  <h3>Boxes offline across back-to-back polling windows
+      <span class="unit">(10 devices)</span></h3>
+  <p class="lead">A box missing from one poll is routine churn on this fleet. These are the boxes that
+     missed <strong>two or more consecutive polls</strong>, which is the threshold at which we stop
+     treating it as noise.</p>
+  <table class="su"><thead><tr><th>Room</th><th>Device ID</th><th class="n">Polls seen</th><th class="n">Consecutive missed</th><th class="n">Minutes</th><th>Dropped at</th><th>Status</th></tr></thead><tbody><tr><td class="mono">410A@B</td><td class="mono sm">10:2b:aa:50:35:1a</td><td class="n">6/13</td><td class="n"><strong>6</strong></td><td class="n">135</td><td class="w">15:29</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">209A@B</td><td class="mono sm">10:2b:aa:50:3c:97</td><td class="n">11/13</td><td class="n"><strong>2</strong></td><td class="n">150</td><td class="w">13:44</td><td>recovered</td></tr><tr><td class="mono">808A@L</td><td class="mono sm">10:2b:aa:50:30:dc</td><td class="n">11/13</td><td class="n"><strong>2</strong></td><td class="n">75</td><td class="w">14:44</td><td>recovered</td></tr><tr><td class="mono">1708A@L</td><td class="mono sm">10:2b:aa:50:90:97</td><td class="n">11/13</td><td class="n"><strong>2</strong></td><td class="n">75</td><td class="w">14:44</td><td>recovered</td></tr><tr><td class="mono">507A@B</td><td class="mono sm">10:2b:aa:50:2c:0e</td><td class="n">10/13</td><td class="n"><strong>2</strong></td><td class="n">75</td><td class="w">14:14</td><td>recovered</td></tr><tr><td class="mono">1712A@L</td><td class="mono sm">10:2b:aa:50:3d:fc</td><td class="n">10/13</td><td class="n"><strong>2</strong></td><td class="n">75</td><td class="w">14:44</td><td>recovered</td></tr><tr><td class="mono">211A@B</td><td class="mono sm">10:2b:aa:50:8f:68</td><td class="n">11/13</td><td class="n"><strong>2</strong></td><td class="n">75</td><td class="w">14:14</td><td>recovered</td></tr><tr><td class="mono">1401S@B</td><td class="mono sm">10:2b:aa:50:35:b6</td><td class="n">11/13</td><td class="n"><strong>2</strong></td><td class="n">75</td><td class="w">14:14</td><td>recovered</td></tr><tr><td class="mono">909A@L</td><td class="mono sm">10:2b:aa:50:35:3b</td><td class="n">10/13</td><td class="n"><strong>2</strong></td><td class="n">45</td><td class="w">16:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">701S@L</td><td class="mono sm">10:2b:aa:50:8f:50</td><td class="n">11/13</td><td class="n"><strong>2</strong></td><td class="n">45</td><td class="w">16:59</td><td><span class=dark>still dark</span></td></tr></tbody></table>
+
+  <div class="ask"><strong>What we are asking DISH:</strong> Berkley is the site we would most like DISH's help on. The distributed shape means the next useful step is above the individual box — we are asking whether DISH sees anything property-wide at Berkley in the 14:14–15:00 ET window today.</div>
+</section>
+<section class="site">
+  <div class="sitehead">
+    <div>
+      <div class="handle">MVM783</div>
+      <h2>The Grandview at Las Vegas</h2>
+      <div class="verdict" style="color:#8c2f13">Buildings 1 and 11 degraded progressively, then collapsed</div>
+    </div>
+    <div class="sitestat">
+      <svg class="spark" viewBox="0 0 190 34" width="190" height="34"><path d="M0.0,7.6 L19.0,7.4 L38.0,5.0 L57.0,5.0 L76.0,5.0 L95.0,5.7 L114.0,6.6 L133.0,10.2 L152.0,7.4 L171.0,7.6 L190.0,31.0 L190,34 L0,34 Z" fill="rgba(20,70,120,.10)"/><path d="M0.0,7.6 L19.0,7.4 L38.0,5.0 L57.0,5.0 L76.0,5.0 L95.0,5.7 L114.0,6.6 L133.0,10.2 L152.0,7.4 L171.0,7.6 L190.0,31.0" fill="none" stroke="#1a5a8a" stroke-width="1.5"/><circle cx="190.0" cy="31.0" r="2.6" fill="#1a5a8a"/></svg>
+      <div class="statrow"><span>4,340</span><em>first poll</em></div>
+      <div class="statrow"><span>4,093</span><em>last poll</em></div>
+      <div class="statrow"><span>4,093–4,367</span><em>day range</em></div>
+      <span class="pill" style="--c:#8c2f13">Needs attention</span>
+    </div>
+  </div>
+
+  <p>This is the clearest and most actionable finding in today's data. Grandview held 4,340–4,367 boxes online from midday through 16:59 ET. At the 17:14 ET poll it fell to 4,093 — a loss of 250 boxes in a single fifteen-minute window, the largest movement recorded at any of the three sites today.</p><p><strong>The loss is almost entirely confined to two buildings.</strong> Building 1 lost 185 of its 276 boxes (67%) and building 11 lost 61 of 87 (70%). Of the roughly twenty other buildings on the property, <strong>every single one lost zero.</strong> Two stray devices elsewhere account for the remainder.</p><p>It did not happen all at once. Those same two buildings had been shedding boxes for four hours beforehand, and nothing else was: 5 boxes at 15:44 ET, 12 at 15:59, 37 at 16:14, 17 at 16:44, 16 at 16:59 — then 246 at 17:14. Across all six windows the losses in buildings 1 and 11 outnumber every other building combined by more than fifty to one.</p><p><strong>Read:</strong> this is consistent with shared infrastructure serving buildings 1 and 11 degrading and then failing, rather than with box-level faults. Confidence: high, on the strength of a monotonic four-hour escalation inside one spatial cluster while twenty peers stayed flat. We have not yet identified the specific shared element and are not asserting one.</p><p>This event was still in progress when this report was generated, so the boxes lost at 17:14 ET have only missed a single poll so far and do not yet appear in the back-to-back table below. The 38 devices that do appear there are the earlier, slower phase of the same pattern.</p>
+
+  <h3>Box count by polling window <span class="unit">(Eastern)</span></h3>
+  <table class="tl">
+    <thead><tr><th>Window</th><th class="n">Online</th><th class="n">Lost</th>
+      <th class="n">Returned</th><th>Where the losses were</th></tr></thead>
+    <tbody><tr class=""><td class="w">13:44</td><td class="n">4,342</td><td class="n neg">−2</td><td class="n pos">+4</td><td class="sm">b4 × 1, b? × 1</td></tr><tr class=""><td class="w">14:29</td><td class="n">4,367</td><td class="n neg">—</td><td class="n pos">+25</td><td class="sm">—</td></tr><tr class=""><td class="w">14:44</td><td class="n">4,367</td><td class="n neg">—</td><td class="n pos">—</td><td class="sm">—</td></tr><tr class=""><td class="w">14:59</td><td class="n">4,367</td><td class="n neg">−1</td><td class="n pos">+1</td><td class="sm">b2 × 1</td></tr><tr class=""><td class="w">15:44</td><td class="n">4,360</td><td class="n neg">−8</td><td class="n pos">+1</td><td class="sm">b1 × 3, b21 × 2, b11 × 2, b2 × 1</td></tr><tr class=""><td class="w">15:59</td><td class="n">4,350</td><td class="n neg">−15</td><td class="n pos">+5</td><td class="sm">b1 × 10, b2 × 3, b11 × 2</td></tr><tr class="hi"><td class="w">16:14</td><td class="n">4,312</td><td class="n neg">−39</td><td class="n pos">+1</td><td class="sm">b1 × 21, b11 × 16, b? × 1, b51 × 1</td></tr><tr class=""><td class="w">16:44</td><td class="n">4,342</td><td class="n neg">−19</td><td class="n pos">+49</td><td class="sm">b1 × 13, b11 × 4, b2 × 1, b? × 1</td></tr><tr class=""><td class="w">16:59</td><td class="n">4,340</td><td class="n neg">−19</td><td class="n pos">+17</td><td class="sm">b1 × 11, b11 × 5, b2 × 2, b? × 1</td></tr><tr class="hi"><td class="w">17:14</td><td class="n">4,093</td><td class="n neg">−250</td><td class="n pos">+3</td><td class="sm">b1 × 185, b11 × 61, b? × 2, b0 × 1</td></tr></tbody>
+  </table>
+
+  <h3>Boxes offline across back-to-back polling windows
+      <span class="unit">(38 devices)</span></h3>
+  <p class="lead">A box missing from one poll is routine churn on this fleet. These are the boxes that
+     missed <strong>two or more consecutive polls</strong>, which is the threshold at which we stop
+     treating it as noise.</p>
+  <table class="su"><thead><tr><th>Room</th><th>Device ID</th><th class="n">Polls seen</th><th class="n">Consecutive missed</th><th class="n">Minutes</th><th>Dropped at</th><th>Status</th></tr></thead><tbody><tr><td class="mono">2501B</td><td class="mono sm">68:ab:a9:fc:97:49</td><td class="n">4/11</td><td class="n"><strong>7</strong></td><td class="n">150</td><td class="w">14:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">21204B</td><td class="mono sm">68:ab:a9:fc:20:bd</td><td class="n">5/11</td><td class="n"><strong>6</strong></td><td class="n">135</td><td class="w">15:44</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">21104A</td><td class="mono sm">68:ab:a9:fe:d0:d3</td><td class="n">5/11</td><td class="n"><strong>6</strong></td><td class="n">135</td><td class="w">15:44</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">2804B</td><td class="mono sm">68:ab:a9:fb:4b:87</td><td class="n">6/11</td><td class="n"><strong>5</strong></td><td class="n">90</td><td class="w">15:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">2102A</td><td class="mono sm">68:ab:a9:fc:29:f6</td><td class="n">6/11</td><td class="n"><strong>5</strong></td><td class="n">90</td><td class="w">15:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">2801B</td><td class="mono sm">68:ab:a9:fe:6d:49</td><td class="n">6/11</td><td class="n"><strong>5</strong></td><td class="n">90</td><td class="w">15:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">GYM3</td><td class="mono sm">10:2b:aa:51:63:5a</td><td class="n">4/11</td><td class="n"><strong>4</strong></td><td class="n">210</td><td class="w">13:44</td><td>recovered</td></tr><tr><td class="mono">1805A@B</td><td class="mono sm">10:2b:aa:51:fc:40</td><td class="n">7/11</td><td class="n"><strong>4</strong></td><td class="n">75</td><td class="w">16:14</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">51102A</td><td class="mono sm">10:2b:aa:51:52:9b</td><td class="n">5/11</td><td class="n"><strong>4</strong></td><td class="n">75</td><td class="w">16:14</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">2701B</td><td class="mono sm">68:ab:a9:f8:d1:a9</td><td class="n">6/11</td><td class="n"><strong>3</strong></td><td class="n">60</td><td class="w">16:44</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">GYM1</td><td class="mono sm">10:2b:aa:51:4f:ec</td><td class="n">7/11</td><td class="n"><strong>3</strong></td><td class="n">60</td><td class="w">16:44</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">1506B@L</td><td class="mono sm">68:ab:a9:fc:46:58</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">11203A</td><td class="mono sm">10:2b:aa:52:66:0f</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1104A</td><td class="mono sm">68:ab:a9:f8:ee:1b</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1501B</td><td class="mono sm">68:ab:a9:fc:34:e5</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1804B@L</td><td class="mono sm">10:2b:aa:51:fc:4c</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1407B@B</td><td class="mono sm">68:ab:a9:fc:49:56</td><td class="n">9/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1905B</td><td class="mono sm">68:ab:a9:f8:d4:1d</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">11101B</td><td class="mono sm">68:ab:a9:fc:3d:f3</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1102A@B</td><td class="mono sm">68:ab:a9:fe:9c:2d</td><td class="n">9/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1605A</td><td class="mono sm">68:ab:a9:fc:1a:6a</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1106A</td><td class="mono sm">68:ab:a9:fc:1a:fd</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">1602B</td><td class="mono sm">68:ab:a9:fc:97:07</td><td class="n">8/11</td><td class="n"><strong>2</strong></td><td class="n">60</td><td class="w">15:59</td><td>recovered</td></tr><tr><td class="mono">2604A</td><td class="mono sm">10:2b:aa:52:65:4f</td><td class="n">9/11</td><td class="n"><strong>2</strong></td><td class="n">30</td><td class="w">16:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">1301B@B</td><td class="mono sm">10:2b:aa:51:4e:ba</td><td class="n">9/11</td><td class="n"><strong>2</strong></td><td class="n">30</td><td class="w">16:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">1104A</td><td class="mono sm">68:ab:a9:fb:86:19</td><td class="n">9/11</td><td class="n"><strong>2</strong></td><td class="n">30</td><td class="w">16:59</td><td><span class=dark>still dark</span></td></tr></tbody></table><p class="more">12 further devices with a 2+ poll outage are in the accompanying CSV.</p>
+
+  <div class="ask"><strong>What we are asking DISH:</strong> We would like DISH to look at buildings 1 and 11 at Grandview specifically, from 15:44 ET onward. If there is a common uplink, controller or IDF serving those two buildings, that is where we would start.</div>
+</section>
+<section class="site">
+  <div class="sitehead">
+    <div>
+      <div class="handle">MVM743</div>
+      <h2>The Cliffs at Peace Canyon</h2>
+      <div class="verdict" style="color:#2d5a3d">Stable; five boxes dark since 13:59 ET</div>
+    </div>
+    <div class="sitestat">
+      <svg class="spark" viewBox="0 0 190 34" width="190" height="34"><path d="M0.0,5.0 L17.3,5.0 L34.5,31.0 L51.8,27.3 L69.1,16.1 L86.4,19.9 L103.6,16.1 L120.9,16.1 L138.2,12.4 L155.5,12.4 L172.7,8.7 L190.0,8.7 L190,34 L0,34 Z" fill="rgba(20,70,120,.10)"/><path d="M0.0,5.0 L17.3,5.0 L34.5,31.0 L51.8,27.3 L69.1,16.1 L86.4,19.9 L103.6,16.1 L120.9,16.1 L138.2,12.4 L155.5,12.4 L172.7,8.7 L190.0,8.7" fill="none" stroke="#1a5a8a" stroke-width="1.5"/><circle cx="190.0" cy="8.7" r="2.6" fill="#1a5a8a"/></svg>
+      <div class="statrow"><span>458</span><em>first poll</em></div>
+      <div class="statrow"><span>457</span><em>last poll</em></div>
+      <div class="statrow"><span>451–458</span><em>day range</em></div>
+      <span class="pill" style="--c:#2d5a3d">Stable</span>
+    </div>
+  </div>
+
+  <p>The Cliffs was the quietest of the three sites. The count sat between 451 and 458 across twelve polls and finished at 457, the day's high. Per-window losses were between zero and eight, and most windows lost nothing at all.</p><p>Five boxes are the exception. They were present at the first two polls, dropped out at 13:59 ET and have not returned in the nine polls since — roughly four and three-quarter hours dark. They are in rooms 1082 (two boxes), 1083, 1002 and 2026, which sit in three different buildings, so this is not one shared failure point.</p><p>We checked these against the field punch list before reporting them: <strong>none of these five rooms has been visited by a technician</strong> — their records are untouched since the 24 July seed. So this is not an artifact of the relabelling sweep running at the property today. They went dark on their own and stayed dark.</p><p>One further note for context rather than concern: Cliffs' RSSI 'bad' bucket reads 14–22 boxes all day. On this fleet those readings are <strong>too strong</strong> — roughly −25 to −34 dBm, a box sitting very close to its access point — not weak signal. We mention it because the label invites the opposite reading.</p>
+
+  <h3>Box count by polling window <span class="unit">(Eastern)</span></h3>
+  <table class="tl">
+    <thead><tr><th>Window</th><th class="n">Online</th><th class="n">Lost</th>
+      <th class="n">Returned</th><th>Where the losses were</th></tr></thead>
+    <tbody><tr class=""><td class="w">12:14</td><td class="n">458</td><td class="n neg">—</td><td class="n pos">—</td><td class="sm">—</td></tr><tr class=""><td class="w">13:59</td><td class="n">451</td><td class="n neg">−8</td><td class="n pos">+1</td><td class="sm">b10 × 4, b20 × 3, b16 × 1</td></tr><tr class=""><td class="w">14:14</td><td class="n">452</td><td class="n neg">−3</td><td class="n pos">+4</td><td class="sm">b10 × 2, b20 × 1</td></tr><tr class=""><td class="w">14:44</td><td class="n">455</td><td class="n neg">—</td><td class="n pos">+3</td><td class="sm">—</td></tr><tr class=""><td class="w">14:59</td><td class="n">454</td><td class="n neg">−1</td><td class="n pos">—</td><td class="sm">b20 × 1</td></tr><tr class=""><td class="w">15:44</td><td class="n">455</td><td class="n neg">—</td><td class="n pos">+1</td><td class="sm">—</td></tr><tr class=""><td class="w">15:59</td><td class="n">455</td><td class="n neg">−1</td><td class="n pos">+1</td><td class="sm">b10 × 1</td></tr><tr class=""><td class="w">16:14</td><td class="n">456</td><td class="n neg">—</td><td class="n pos">+1</td><td class="sm">—</td></tr><tr class=""><td class="w">16:44</td><td class="n">456</td><td class="n neg">—</td><td class="n pos">—</td><td class="sm">—</td></tr><tr class=""><td class="w">16:59</td><td class="n">457</td><td class="n neg">−1</td><td class="n pos">+2</td><td class="sm">b10 × 1</td></tr><tr class=""><td class="w">17:14</td><td class="n">457</td><td class="n neg">−1</td><td class="n pos">+1</td><td class="sm">b10 × 1</td></tr></tbody>
+  </table>
+
+  <h3>Boxes offline across back-to-back polling windows
+      <span class="unit">(6 devices)</span></h3>
+  <p class="lead">A box missing from one poll is routine churn on this fleet. These are the boxes that
+     missed <strong>two or more consecutive polls</strong>, which is the threshold at which we stop
+     treating it as noise.</p>
+  <table class="su"><thead><tr><th>Room</th><th>Device ID</th><th class="n">Polls seen</th><th class="n">Consecutive missed</th><th class="n">Minutes</th><th>Dropped at</th><th>Status</th></tr></thead><tbody><tr><td class="mono">1082 B1</td><td class="mono sm">18:0c:7a:8a:85:f9</td><td class="n">2/12</td><td class="n"><strong>10</strong></td><td class="n">300</td><td class="w">13:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">2026</td><td class="mono sm">38:e1:f4:48:83:9d</td><td class="n">2/12</td><td class="n"><strong>10</strong></td><td class="n">300</td><td class="w">13:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">1083</td><td class="mono sm">38:e1:f4:48:db:14</td><td class="n">2/12</td><td class="n"><strong>10</strong></td><td class="n">300</td><td class="w">13:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">1082</td><td class="mono sm">38:e1:f4:48:82:04</td><td class="n">2/12</td><td class="n"><strong>10</strong></td><td class="n">300</td><td class="w">13:59</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">1002</td><td class="mono sm">38:e1:f4:48:8d:0c</td><td class="n">3/12</td><td class="n"><strong>9</strong></td><td class="n">195</td><td class="w">14:14</td><td><span class=dark>still dark</span></td></tr><tr><td class="mono">16</td><td class="mono sm">8c:9a:8f:d9:f5:d1</td><td class="n">10/12</td><td class="n"><strong>2</strong></td><td class="n">150</td><td class="w">13:59</td><td>recovered</td></tr></tbody></table>
+
+  <div class="ask"><strong>What we are asking DISH:</strong> For Cliffs we are only asking about the five dark boxes listed below. The rest of the property is behaving well and needs nothing from DISH today.</div>
+</section>
+
+<div class="foot">
+  Generated Monday 3 August 2026 from 36 iCX per-device exports
+  (MVM784 ×13, MVM783 ×11, MVM743 ×12), all retained by MVM and
+  available on request. Room identifiers are as they appear in iCX. No guest information is included
+  in this report. Questions: Michele Blanton, MVM Technology.
+</div>
