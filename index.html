@@ -162,6 +162,9 @@
 .air{display:flex;align-items:center;gap:14px;padding:6px 10px;
  font-size:12px;font-weight:600;border-bottom:1px solid var(--line)}
 .air>span:first-child{flex:0 0 300px}
+/* on a phone a 300px label left ~40px of select — stack instead, full-width tap target */
+@media(max-width:640px){.air{flex-direction:column;align-items:stretch;gap:5px}
+ .air>span:first-child{flex:none}}
 .air:last-child{border-bottom:0}
 .aib{border-top:1px solid var(--line)}
 .aih{padding:5px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
@@ -303,6 +306,9 @@ const TVN={matches_guest:['good','matches the checked-in guest'],
 const QR={BOTH:['good','both TVs'],BEDROOM_ONLY:['warn','bedroom only'],
  LIVING_ONLY:['warn','living room only'],NEITHER:['bad','neither TV']};
 let open=new Set();
+// a click that must NOT collapse the room it happened inside
+const noToggle=e=>!!(e.target&&e.target.closest
+ &&e.target.closest('input,select,textarea,button,label,option,.dsec.ai'));
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const mac=h=>h?h.match(/../g).join(':'):'';
@@ -491,7 +497,7 @@ function actionItems(r,order,POSN){
  const ti=k=>`<input class="aii" type="text" data-ai="${esc(k)}" value="${esc(aiGet(k))}"
    autocomplete="off" spellcheck="false">`;
  const sel=(k,opts)=>`<select class="ais" data-ai="${esc(k)}">`
-   +['',...opts].map(o=>`<option value="${esc(o)}"${aiGet(k)===o?' selected':''}>${o||'&mdash;'}</option>`).join('')
+   +['',...opts].map(o=>`<option value="${esc(o)}"${aiGet(k)===o?' selected':''}>${o?esc(o):'&mdash;'}</option>`).join('')
    +`</select>`;
  const fld=(k,kind)=>kind==='text'?ti(k):sel(k,kind);
  const block=p=>`<div class="aib"><div class="aih">${POSN[p]||p}</div>
@@ -503,8 +509,8 @@ function actionItems(r,order,POSN){
    </tbody></table></div>`;
  return `<div class="dsec ai"><div class="dsh"><span>Action items &mdash; ${esc(room)}</span>
    <b class="warn">${JWHY(r).join(' &middot; ')}</b></div>
-  <div class="aip">${AICHECKS.map(([id,lbl])=>
-    `<div class="air"><span>${lbl}</span>${sel(key(id),['Yes','No'])}</div>`).join('')}</div>
+  <div class="aip">${AICHECKS.map(([id,lbl,opts])=>
+    `<div class="air"><span>${lbl}</span>${sel(key(id),opts)}</div>`).join('')}</div>
   ${order.map(block).join('')}
   <div class="aif">Saved on this device as you type &mdash; not synced. Use
    <b>Download work orders</b> to get it off the phone.</div></div>`}
@@ -609,9 +615,15 @@ function render(){
   </div>`}).join('')+(Rs.length>400?`<div class="sm-empty">Showing the first 400 — narrow the filter or download.</div>`:'')
   :`<div class="sm-empty">Nothing matches.</div>`;
  const toggle=el=>{const rm=el.dataset.room; open.has(rm)?open.delete(rm):open.add(rm); render()};
+ // On a phone the whole card is the tap target, so a tap on a work-order dropdown bubbled up here,
+ // collapsed the room and threw you back to the list before the options could open. Anything
+ // interactive — and the work order as a whole, which you should not be able to shut by accident
+ // mid-entry — is excluded; collapse from the room header instead. Space in a text field hit the
+ // keydown path the same way, so that only fires when the card itself has focus.
  $('smCards').querySelectorAll('.sm-card[data-room]').forEach(el=>{
-  el.onclick=()=>toggle(el);
-  el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(el)}}});
+  el.onclick=e=>{if(noToggle(e))return;toggle(el)};
+  el.onkeydown=e=>{if(e.target!==el)return;
+   if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(el)}}});
  const C=[['Room',R.room],['Presence',R.pres],['Labeling',R.labl],['Casting',R.cast],['Reswept',null]];
  $('smHead').innerHTML='<tr>'+C.map(([l,k])=>
   `<th${k!=null?` data-k="${k}"`:''}>${l}${sk===k&&k!=null?(sd>0?' ▲':' ▼'):''}</th>`).join('')+'</tr>';
@@ -630,8 +642,10 @@ function render(){
   const det=isOpen?`<tr class="dt"><td colspan="${C.length}">${drill(s,r)}</td></tr>`:'';
   return main+det}).join('');
  const tog=el=>{const rm=el.dataset.room; open.has(rm)?open.delete(rm):open.add(rm); render()};
- $('smTbody').querySelectorAll('tr.rw').forEach(el=>{el.onclick=()=>tog(el);
-  el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(el)}}});
+ $('smTbody').querySelectorAll('tr.rw').forEach(el=>{
+  el.onclick=e=>{if(noToggle(e))return;tog(el)};
+  el.onkeydown=e=>{if(e.target!==el)return;
+   if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(el)}}});
  const O=s.orphans;
  $('smOrphNote').textContent=O.length
   ? `${O.length} device${O.length>1?'s':''} report a room number that is not a unit in the room list — lockout parents, common-area TVs, or a mistyped room. Their MACs are recorded here so they can be traced back.`
