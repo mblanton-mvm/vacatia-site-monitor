@@ -124,6 +124,12 @@
         .filter(k => Math.abs(tot(t[k]) - t.onlineSTB) > Math.max(25, t.onlineSTB * 0.02));
       if (bad.length) return { err: 'BUCKETS_FOREIGN', onlineSTB: t.onlineSTB,
                                totals: Object.fromEntries(bad.map(k => [k, tot(t[k])])) };
+      // All four buckets must describe the SAME 15-minute window. Seen 2026-08-03: net_stats
+      // still served :15 while system_performance_1 had already rolled to :30, producing a tick
+      // that measured neither window. The count guard misses this — the totals still agree.
+      const ws = [...new Set(['rssi', 'disrupt', 'reboot', 'navail']
+        .map(k => t[k] && t[k].upto).filter(Boolean))];
+      if (ws.length > 1) return { err: 'WINDOW_STRADDLE', windows: ws };
     }
     return t;
   };
