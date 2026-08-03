@@ -1,0 +1,62 @@
+Application Name,Package Name,Cumulative Usage(Hrs),STB Count
+OnStream,tv.accedo.xdk.dishtv,839479.14,474
+Backdrop,com.google.android.backdrop,26800.35,471
+YouTube,com.google.android.youtube.tv,15181.13,468
+Netflix,com.netflix.ninja,7915.09,470
+Prime Video,com.amazon.amazonvideo.livingroom,1338.37,267
+Disney+,com.disney.disneyplus,1117.76,299
+Android TV Home,com.google.android.tvlauncher,912.61,7
+Hulu,com.hulu.livingroomplus,557.83,159
+HBO Max,com.wbd.stream,402.35,126
+YouTube TV,com.google.android.youtube.tvunplugged,381.91,39
+Tubi,com.tubitv,323.00,18
+Paramount+,com.cbs.ott,278.63,48
+Google,com.google.android.katniss,204.68,465
+Peacock TV,com.peacocktv.peacockandroid,129.31,39
+Sagemcom Partner Interface,com.sagemcom.stb.partnerinterface,128.37,381
+Google Cast,com.google.android.apps.mediashell,95.92,48
+Spotify,com.spotify.tv.android,66.38,18
+ARVIO,com.arvio.tv,55.56,3
+Apple TV,com.apple.atve.androidtv.appletv,52.43,25
+TuneIn Radio,tunein.player,38.57,2
+Crunchyroll,com.crunchyroll.crunchyroid,34.05,14
+BrowseHere,com.tcl.browser,31.72,2
+Pluto TV,tv.pluto.android,30.57,9
+Google Play services,com.google.android.gms,30.43,356
+Fubo,com.fubo.firetv.screen,25.49,4
+Discovery Plus,com.discovery.discoveryplus.mobile,25.25,4
+Google Play Store,com.android.vending,16.36,294
+Stremio,com.stremio.one,11.10,1
+Now Thats TV Plus,ott.nowthatstv,10.85,5
+UFC,com.neulion.smartphone.ufc.android,10.32,4
+APP,ar.tvplayer.tv,8.05,1
+SmartTube beta,org.smarttube.beta,6.71,1
+Garage,au.com.garage.android,5.21,1
+Zeus,com.thezeusnetwork.www,4.67,3
+CBS Sports,com.handmark.sportscaster.androidtv,4.30,1
+RCU Updater,com.sagemcom.stb.rcuupdater,3.93,374
+ESPN,com.espn.score_center,3.40,9
+The Roku Channel,com.roku.web.trc,2.72,1
+Settings,com.android.tv.settings,2.56,15
+DIRECTV,com.att.tv,2.42,1
+ViX,com.univision.prendetv,2.42,1
+Fandango at Home,air.com.vudu.air.DownloaderTablet,2.38,1
+Kick: Live Streaming,com.kick.mobile,1.50,1
+MotoGP™,com.dorna.officialmotogp,1.47,1
+Setup Wizard,com.google.android.tungsten.setupwraith,1.25,79
+iCX,com.tataelxsi.icx,0.69,93
+MLB,com.bamnetworks.mobile.android.gameday.atbat,0.61,1
+Google Play Games,com.google.android.play.games,0.60,26
+NFL,com.gotv.nflgamecenter.us.lite,0.39,1
+Permission controller,com.google.android.permissioncontroller,0.36,152
+Downloader,com.esaba.downloader,0.14,2
+Cinema Box Android TV,co.albox.cinematv,0.13,1
+FanDuel Sports Network,com.foxsports.videogo,0.08,1
+SEG+,com.kiswe.androidtv.utahjazz,0.07,1
+System UI,com.android.systemui,0.07,9
+Package installer,com.google.android.packageinstaller,0.03,2
+Live TV,com.android.tv,0.02,3
+Cartoon Network,com.turner.cnvideoapp,0.01,1
+Android TV Core Services,com.google.android.tvrecommendations,0.00,1
+Background Apps and Process List,io.github.visnkmr.bapl,0.00,1
+Stremio Launch on Boot,com.stremio.tv.boot,0.00,1
