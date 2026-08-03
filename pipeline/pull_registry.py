@@ -37,6 +37,7 @@ SITES = ['MVM784', 'MVM783', 'MVM743']
 KEYCHAIN_SERVICE = 'mvm-staging-mysql-url'
 SITE_RE = re.compile(r'^MVM\d{3,}$')          # nothing unvalidated reaches the SQL text
 STALE_HOURS = 2.0
+CHECKED = {}
 
 
 def _keychain(service):
@@ -119,6 +120,24 @@ def is_randomized(mac):
         return None
 
 
+def last_checked(u, site):
+    """When the collector last LOOKED, as opposed to when the registry last CHANGED.
+
+    The on-box store dedupes on UNIQUE(site_code, kind, sha256) — an identical payload is simply
+    not stored. The casting registry only changes when someone relabels, so a quiet day writes ONE
+    row and the naive reading is "the collector is dying". It is not: on 2026-08-03 MVM784 wrote 16
+    htvc_stb_monitoring rows against 1 mdns row, i.e. the probe ran 16 times and the registry was
+    identical 15 of them.
+
+    htvc_stb_monitoring is captured in the SAME probe run and carries per-STB last_seen stamps, so
+    its content changes every time — which makes its newest captured_at an honest proxy for "the
+    registry was read at least this recently".
+    """
+    out = query(u, "SELECT MAX(captured_at) FROM staging_site_captures "
+                   f"WHERE site_code='{site}' AND kind='htvc_stb_monitoring';").strip()
+    return '' if out in ('', 'NULL') else out
+
+
 def pull(u, site, outdir, now):
     head = query(u, "SELECT id, captured_at FROM staging_site_captures "
                     f"WHERE site_code='{site}' AND kind='{KIND}' "
@@ -142,11 +161,13 @@ def pull(u, site, outdir, now):
         for r in rows:
             w.writerow([r.get('mac'), r.get('room'), r.get('ip'), r.get('id'),
                         is_randomized(r.get('mac'))])
+    chk = last_checked(u, site)
+    CHECKED[site] = chk
     rand = sum(1 for r in rows if is_randomized(r.get('mac')))
     age = (now - cap).total_seconds() / 3600
-    flag = '  <-- STALE, the collector on this appliance is behind' if age > STALE_HOURS else ''
     print(f"  {site}: {len(rows):>5} rows ({len(rows) - rand} real / {rand} randomized) "
-          f"captured {cap.strftime('%Y-%m-%d %H:%MZ')}, {age:.1f} h old{flag}")
+          f"unchanged since {cap.strftime('%Y-%m-%d %H:%MZ')} ({age:.1f} h), "
+          f"last checked {chk or 'unknown'}")
     print(f"         -> {os.path.basename(out)}")
     return out
 
@@ -162,6 +183,7 @@ def main():
     print(f"staging {u.hostname}:{u.port or 3306} · read-only · TLS required")
     for site in sites:
         pull(u, site, outdir, now)
+    json.dump(CHECKED, open(os.path.join(outdir, 'registry-checked.json'), 'w'), indent=1)
 
 
 if __name__ == '__main__':

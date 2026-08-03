@@ -55,8 +55,11 @@ echo "── 2. mDNS registry ──"
 if ! python3 pull_registry.py .; then
   echo "   !! staging pull FAILED — falling back to the newest export on disk"
 fi
+# Hand-saved appliance exports (see ingest_drop.py). The path that does NOT depend on staging,
+# which matters whenever the staging volume is full and every writer is blocked.
+python3 ingest_drop.py drop . || echo "   !! drop ingest error (continuing)"
 for p in 784 783 743; do
-  f=$(ls -t reg-MVM$p-*.csv 2>/dev/null | head -1)
+  f=$(ls reg-MVM$p-*.csv 2>/dev/null | sort | tail -1)
   if [ -z "$f" ]; then
     echo "   MVM$p: NO registry export — casting reads 'no registry export'"
   fi
@@ -65,7 +68,7 @@ done
 echo "── 3. rebuild state ──"
 # newest registry per site; the capture stamp lives in the FILENAME (never the mtime)
 REG=(); for p in 784 783 743; do
-  f=$(ls -t reg-MVM$p-*.csv 2>/dev/null | head -1)
+  f=$(ls reg-MVM$p-*.csv 2>/dev/null | sort | tail -1)
   [ -n "$f" ] && REG+=(--registry "MVM$p=$f")
 done
 PJ=();  for p in 784 783 743; do [ -f "punch-$p.json" ] && PJ+=(--punchjson "MVM$p=punch-$p.json"); done
