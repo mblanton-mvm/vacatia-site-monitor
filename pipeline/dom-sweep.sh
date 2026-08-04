@@ -24,6 +24,27 @@ DL=/Users/micheleblanton/Downloads
 STAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
 echo "════ dom-sweep $STAMP ════"
 
+# ── single-writer lock ─────────────────────────────────────────────────────────
+# There is ONE Chrome tab, ONE Downloads dir and ONE icx/ bank, so two concurrent sweeps
+# corrupt each other. On 2026-08-04 a surviving 15-min heartbeat inside an abandoned Claude
+# session swept at the same time as this one: it changed the site selection mid-capture
+# (SELECTOR GUARD FAILED / PANEL_DID_NOT_OPEN), and its restricted run rewrote the window's
+# combined site CSV over rows the other run had just banked. The launchd poller (:02/:17/:32/:47)
+# and an in-session heartbeat (:03/:18/:33/:48) are one minute apart, so without this they
+# overlap by design. mkdir is atomic; a lock older than 12 minutes is treated as stale.
+LOCK="$PIPE/.sweep.lock"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  if [ -n "$(find "$LOCK" -maxdepth 0 -mmin +12 2>/dev/null)" ]; then
+    echo "stale lock (>12 min) — taking it over"
+    rm -rf "$LOCK"; mkdir "$LOCK" 2>/dev/null || true
+  else
+    echo "another sweep is already running (holder: $(cat "$LOCK/owner" 2>/dev/null || echo '?')) — exiting without touching anything"
+    exit 0
+  fi
+fi
+echo "pid $$ started $STAMP" > "$LOCK/owner"
+trap 'rm -rf "$LOCK"' EXIT
+
 SITES=(
   "MVM743|The Cliffs|The Cliffs"
   "MVM784|The Berkley|The Berkley"
@@ -230,7 +251,10 @@ if [ "${#SITEROWS[@]:-0}" -gt 0 ] && [ -n "$WINDOW" ]; then
   # MERGE, never overwrite: a restricted run (`./dom-sweep.sh MVM783`) would otherwise clobber
   # the sites another run already banked for this same window, silently turning a 3-site record
   # into a 1-site one.
-  printf '%s\n' "${SITEROWS[@]}" | /usr/bin/python3 - "$OUT" <<'PY'
+  # Rows go in as ARGV, not stdin: `python3 -` already takes its program from stdin, so a pipe
+  # into it is silently swallowed and every row is lost (bit me at 23:19Z — the merge reported
+  # "1 of 3 sites" right after successfully banking a second one).
+  /usr/bin/python3 - "$OUT" "${SITEROWS[@]}" <<'PY'
 import sys, os
 HDR = 'handle,name,total_devices,pms_connected,s1_total,m1_total,m2_total,m2_pms_connected'
 path = sys.argv[1]
@@ -240,7 +264,7 @@ if os.path.exists(path):
         line = line.strip()
         if line and not line.startswith('handle,'):
             rows[line.split(',')[0]] = line
-for line in sys.stdin:
+for line in sys.argv[2:]:
     line = line.strip()
     if line:
         rows[line.split(',')[0]] = line
