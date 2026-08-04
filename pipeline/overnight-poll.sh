@@ -46,8 +46,18 @@ jsfile() {  # inject a whole file (escaped for AppleScript's string literal)
   local esc; esc=$(python3 - "$f" <<'PY'
 import sys, json
 src = open(sys.argv[1], encoding='utf-8').read()
-# AppleScript string: escape backslashes and double quotes, strip newlines to spaces
-print(json.dumps(src)[1:-1].replace('\\n', ' ').replace('\\r', ' '))
+# AppleScript string literals DO honour \n, \t, \\ and \" escapes, so json.dumps output can be
+# handed to `execute javascript` as-is (minus its surrounding quotes).
+#
+# Do NOT flatten the newlines. Doing so was a silent, total failure: icx-toolkit.js is ~200 lines
+# of `//`-commented JS, so collapsing it onto one line makes the FIRST `//` comment swallow the
+# entire rest of the file. The injection then evaluates to nothing, __health() is undefined, and the
+# sweep aborts with a misleading "dashboard not ready (NO_TOOLKIT)". Verified 2026-08-04:
+#   execute javascript "var a=1;//c\nvar b=2; a+b"  -> 3        (newlines preserved)
+#   execute javascript "var c=1;//c var d=2; c+d"   -> missing  (flattened)
+# This bug hid behind the "AppleScript JS is disabled" exit all day, so the poller had never once
+# completed a real capture.
+print(json.dumps(src)[1:-1])
 PY
 )
   osascript <<APPLESCRIPT 2>&1
@@ -166,7 +176,9 @@ done
 fi   # end ICX_OK sweep
 
 # ── 2. combined site CSV for the window ────────────────────────────────────────
-if [ ${#SITEROWS[@]} -gt 0 ] && [ -n "${WINDOW:-}" ]; then
+# `${#SITEROWS[@]}` on an empty array trips `set -u` in bash 3.2 (macOS), which is exactly the
+# path taken whenever the iCX sweep is skipped. Guard the expansion instead.
+if [ ${#SITEROWS[@]+${#SITEROWS[@]}} ] && [ "${#SITEROWS[@]:-0}" -gt 0 ] && [ -n "${WINDOW:-}" ]; then
   OUT="$DROPS/icx-sweeps/$WINDOW/dish-icx-vacatia3-site-$WINDOW.csv"
   mkdir -p "$(dirname "$OUT")"
   { echo 'handle,name,total_devices,pms_connected,s1_total,m1_total,m2_total,m2_pms_connected'
