@@ -41,7 +41,11 @@ from datetime import datetime, timedelta, timezone
 PIPE = os.path.dirname(os.path.abspath(__file__))
 DROPS = os.path.expanduser('~/Developer/mvm-platform/docs/vacatia/data-drops')
 SWEEPS = f'{DROPS}/icx-sweeps'
-LOG = os.path.expanduser(
+# Overridable so the scheduled run can target a dedicated git worktree instead of
+# Michele's live working tree. The 15:17Z run committed onto whatever branch happened to
+# be checked out (it caught `main` mid-session) — exactly the collision CLAUDE.md §11
+# means by "one editor per branch at a time".
+LOG = os.environ.get('WATCHLOG') or os.path.expanduser(
     '~/Developer/mvm-platform/docs/vacatia/vacatia-3site-watch-log.md')
 
 SITES = [
@@ -58,6 +62,21 @@ SITES = [
 
 CONCENTRATION_MIN_RATIO = 3.0   # below this a "concentration" is just fleet shape
 ESCALATION_RUN = 3              # consecutive falling windows before it is a trend
+
+# Thresholds that exist to stop the digest crying wolf. Every one of these was added
+# after the first dry-run (2026-08-04 15:14Z) produced a "LOCALIZED at 333x fleet share"
+# verdict off a SINGLE box whose room number would not parse.
+MIN_LOSS_FOR_CONC = 5      # a 1-3 box loss has no spatial signal worth computing
+MIN_GROUP_LOSS = 3         # one box in a small group is not a concentration
+MIN_GROUP_FLEET = 20       # tiny denominators manufacture huge ratios
+MIN_DROP_ABS = 5           # a -1 window is churn, not a dip
+# 0.2%, not 0.5%: at Grandview's 4,351 boxes a 0.5% floor is 21 boxes, which silently
+# suppressed the 14:00Z loss of 16 that was ENTIRELY inside buildings 1 and 11 — the one
+# signature at this site worth catching. Size is not what makes a loss meaningful here;
+# concentration is. Keep the floor low and let the concentration test do the judging.
+MIN_DROP_FRAC = 0.002
+NAVAIL_MIN_ABS = 10        # 1-2 availability-bad boxes is the normal floor
+NAVAIL_MIN_FRAC = 0.01
 
 
 def windows_in_range(since, until):
@@ -130,19 +149,33 @@ def concentration(handle, grouping, keyfn, prev_t, cur_t):
     if not prev or not cur:
         return None
     lost = set(prev) - set(cur)
-    if not lost:
-        return None
+    if len(lost) < MIN_LOSS_FOR_CONC:
+        # Not enough boxes to carry a spatial signal. Report the count, claim nothing.
+        return {'lost': len(lost), 'grouping': grouping, 'rows': [],
+                'concentrated': [], 'too_small': True, 'unparsed': 0}
     fleet = collections.Counter(keyfn(v) for v in prev.values())
     loss = collections.Counter(keyfn(prev[m]) for m in lost)
-    total, L = sum(fleet.values()), len(lost)
+    # '?' is "room number did not parse", not a place. Left in, it becomes a tiny-fleet
+    # group that manufactures a 300x ratio off one box.
+    unparsed = loss.pop('?', 0)
+    fleet.pop('?', None)
+    total, L = sum(fleet.values()), sum(loss.values())
+    if not total or not L:
+        return {'lost': len(lost), 'grouping': grouping, 'rows': [],
+                'concentrated': [], 'too_small': True, 'unparsed': unparsed}
     rows = []
     for g, n in loss.most_common():
         fs = fleet[g] / total
         rows.append({'group': g, 'lost': n, 'fleet': fleet[g],
                      'loss_share': n / L, 'fleet_share': fs,
                      'ratio': (n / L) / fs if fs else 0.0})
-    return {'lost': L, 'grouping': grouping, 'rows': rows,
-            'concentrated': [r for r in rows if r['ratio'] >= CONCENTRATION_MIN_RATIO]}
+    conc = [r for r in rows
+            if r['ratio'] >= CONCENTRATION_MIN_RATIO
+            and r['lost'] >= MIN_GROUP_LOSS
+            and r['fleet'] >= MIN_GROUP_FLEET]
+    return {'lost': len(lost), 'grouping': grouping, 'rows': rows,
+            'concentrated': conc, 'too_small': False, 'unparsed': unparsed,
+            'groups_touched': len(rows), 'groups_total': len(fleet)}
 
 
 def analyse(since, until):
@@ -171,21 +204,22 @@ def analyse(since, until):
             continue
         counts = [x['online'] for x in s]
         med = statistics.median(counts)
+        floor_drop = max(MIN_DROP_ABS, int(med * MIN_DROP_FRAC))
         dips, falling, run = [], [], 0
         for i, x in enumerate(s):
-            below = x['online'] < med
-            if i and s[i]['online'] < s[i - 1]['online']:
+            delta = x['online'] - s[i - 1]['online'] if i else 0
+            if i and delta < 0:
                 run += 1
             else:
                 run = 0
-            if below:
+            # A dip is a REAL FALL of at least floor_drop boxes. Being under the period
+            # median is not enough: a window that rose by 1 was landing in the dip list.
+            if i and delta <= -floor_drop:
                 dip = {'w': x['w'], 't': x['t'], 'online': x['online'],
-                       'delta': x['online'] - s[i - 1]['online'] if i else 0,
-                       'navail_bad': x['navail_bad'],
+                       'delta': delta, 'navail_bad': x['navail_bad'],
                        'run': run, 'conc': None}
-                if i:
-                    dip['conc'] = concentration(handle, grouping, keyfn,
-                                                s[i - 1]['t'], x['t'])
+                dip['conc'] = concentration(handle, grouping, keyfn,
+                                            s[i - 1]['t'], x['t'])
                 dips.append(dip)
             if run >= ESCALATION_RUN:
                 falling.append(x['w'])
@@ -198,7 +232,10 @@ def analyse(since, until):
             'rssi_bad_range': (min(x['rssi_bad'] for x in s if x['rssi_bad'] is not None),
                               max(x['rssi_bad'] for x in s if x['rssi_bad'] is not None))
             if any(x['rssi_bad'] is not None for x in s) else None,
-            'navail_bad_windows': [x['w'] for x in s if (x['navail_bad'] or 0) > 0],
+            'navail_bad_windows': [
+                x['w'] for x in s
+                if (x['navail_bad'] or 0) >= max(NAVAIL_MIN_ABS, int(med * NAVAIL_MIN_FRAC))],
+            'floor_drop': floor_drop,
             'reboots': reb,
             'dips': dips,
             'escalation_windows': falling,
@@ -225,8 +262,17 @@ def verdict(site):
             f"{len(conc)} dip(s) concentrated in {worst['conc']['grouping']} "
             f"{g['group']} at {g['ratio']:.1f}x its fleet share")
     if site['dips']:
-        return 'DIPS, DIFFUSE', f"{len(site['dips'])} dip(s), no spatial concentration"
-    return 'FLAT', 'no window below the period median'
+        spread = [d for d in site['dips'] if d['conc'] and not d['conc']['too_small']]
+        if spread:
+            worst = max(spread, key=lambda d: -d['delta'])
+            c = worst['conc']
+            return 'DIPS, DIFFUSE', (
+                f"{len(site['dips'])} dip(s), no group above "
+                f"{CONCENTRATION_MIN_RATIO:.0f}x its fleet share "
+                f"(largest spread over {c['groups_touched']} of {c['groups_total']} "
+                f"{c['grouping']}s)")
+        return 'DIPS, DIFFUSE', f"{len(site['dips'])} dip(s), too small to localize"
+    return 'FLAT', f"no fall of {site['floor_drop']}+ boxes between windows"
 
 
 def render(report, teams=False):
@@ -265,11 +311,15 @@ def render(report, teams=False):
             L.append(f'  {why}')
             for d in s['dips']:
                 bits = [f'{hz(d["t"])} {d["online"]} ({d["delta"]:+d})']
-                if d['conc'] and d['conc']['concentrated']:
-                    for r in d['conc']['concentrated']:
-                        bits.append(f'{r["lost"]}/{d["conc"]["lost"]} in '
-                                    f'{d["conc"]["grouping"]} {r["group"]} '
+                c = d['conc']
+                if c and c['concentrated']:
+                    for r in c['concentrated']:
+                        bits.append(f'{r["lost"]}/{c["lost"]} in '
+                                    f'{c["grouping"]} {r["group"]} '
                                     f'({r["ratio"]:.1f}x fleet share)')
+                elif c and not c['too_small']:
+                    bits.append(f'spread over {c["groups_touched"]} '
+                                f'{c["grouping"]}s, none concentrated')
                 L.append(f'  - {" — ".join(bits)}')
     L.append('')
     return '\n'.join(L)
