@@ -1,0 +1,215 @@
+#!/bin/bash
+# iCX sweep, DOM-ONLY capture path. Replaces the response-hook path in overnight-poll.sh.
+#
+# WHY: Chrome's AppleScript `execute javascript` runs in an isolated world, so the page's own
+# fetch/XHR cannot be hooked from here and icx-toolkit.js's __icxResp stays empty forever —
+# every site failed `NO_WINDOW` on every 15-min sweep from 20:47Z on 2026-08-04 while cycle.sh
+# kept republishing the page with a fresh timestamp off stale counts. See icx-dom.js and
+# docs/session-handoffs/vacatia-icx-polling-2026-08-04-evening.md §2-3.
+#
+# DESIGN: one osascript operation per call with REAL BASH SLEEPS between them. Bash sleeps are
+# immune to Chrome's background-tab timer throttling; a single long in-page await is not.
+#
+# MVM743 runs FIRST: it is the site whose export click keeps sticking (stuck kebab), so it gets
+# the freshest page state rather than the most-churned.
+#
+# The window comes from the EXPORT'S OWN row-2 timestamp, not from any API payload. That
+# timestamp is EASTERN wall clock despite the column header naming AST and despite the filename
+# suffix — see memory `reference-icx-export-timezone`.
+set -uo pipefail
+cd "$(dirname "$0")"
+PIPE="$(pwd)"
+DROPS=/Users/micheleblanton/Developer/mvm-platform/docs/vacatia/data-drops
+DL=/Users/micheleblanton/Downloads
+STAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+echo "════ dom-sweep $STAMP ════"
+
+SITES=(
+  "MVM743|The Cliffs|The Cliffs"
+  "MVM784|The Berkley|The Berkley"
+  "MVM783|The Grandview|The Grandview"
+)
+
+jsq() {
+  osascript <<APPLESCRIPT 2>&1
+tell application "Google Chrome"
+  repeat with w in windows
+    repeat with t in tabs of w
+      if URL of t contains "dashboardfe-dms" then
+        return (execute t javascript "$1")
+      end if
+    end repeat
+  end repeat
+  return "NO_DASHBOARD_TAB"
+end tell
+APPLESCRIPT
+}
+
+jsfile() {
+  # base64, never string-escaping: a `//` comment flattened onto one line swallows the rest of
+  # the file, and json.dumps's \uXXXX breaks AppleScript's own string parser on the U+2500
+  # comment banners. Both were live bugs on 2026-08-04.
+  local b64; b64=$(python3 -c "import base64,sys;print(base64.b64encode(open(sys.argv[1],'rb').read()).decode())" "$1")
+  jsq "eval(new TextDecoder().decode(Uint8Array.from(atob('$b64'), function(c){return c.charCodeAt(0)})))"
+}
+
+# ── 0. gate ────────────────────────────────────────────────────────────────────
+# These gate the iCX SWEEP ONLY and must never skip the rebuild: the mDNS registry pull does not
+# touch Chrome at all. A Chrome preference should not be able to freeze the whole monitor.
+ICX_OK=1
+icx_skip() { echo "$1"; ICX_OK=0; }
+
+if ! pgrep -xq "Google Chrome"; then
+  icx_skip "Chrome not running — iCX sweep skipped"
+else
+  H=$(jsq "window.__health?window.__health():'NO_TOOLKIT'")
+  case "$H" in
+    *NO_DASHBOARD_TAB*) icx_skip "no dashboard tab — iCX sweep skipped" ;;
+    *"turned off"*)     icx_skip "AppleScript JS is disabled in Chrome (View > Developer > Allow JavaScript from Apple Events) — iCX sweep skipped; rebuild still running." ;;
+  esac
+  if [ "$ICX_OK" = 1 ]; then
+    jsfile "$PIPE/icx-toolkit.js" >/dev/null   # __selHandle + __dlOnline (both pure DOM)
+    D=$(jsfile "$PIPE/icx-dom.js")             # __selStart/__domRead/__dlStart
+    [[ "$D" == *DOM_OK* ]] || icx_skip "icx-dom.js did not inject ($D) — iCX sweep skipped"
+    H=$(jsq "window.__health()")
+  fi
+  if [ "$ICX_OK" = 1 ] && [[ "$H" == *'"onLogin":true'* ]]; then
+    icx_skip "AUTH_LAPSED — portal session expired, needs a human login. iCX sweep skipped."
+  fi
+  if [ "$ICX_OK" = 1 ] && [[ "$H" != *'"hasSelector":true'* ]]; then
+    icx_skip "dashboard not ready ($H) — iCX sweep skipped"
+  fi
+fi
+
+# ── 1. per site ────────────────────────────────────────────────────────────────
+NEWDATA=0
+declare -a SITEROWS=()
+WINDOW=""
+
+if [ "$ICX_OK" = 1 ]; then
+for spec in "${SITES[@]}"; do
+  IFS='|' read -r HANDLE NAME LABEL <<< "$spec"
+  echo "── $HANDLE ──"
+
+  # a. select this site, and only this site
+  jsq "window.__selStart('$LABEL')" >/dev/null
+  SEL=""
+  for _ in $(seq 1 20); do
+    sleep 2
+    SEL=$(jsq "window.__selRes||'PENDING'")
+    [[ "$SEL" != *PENDING* ]] && break
+  done
+  if [[ "$SEL" != *'"ok":true'* ]]; then
+    echo "  $HANDLE: SELECT FAILED ${SEL:0:160}"; continue
+  fi
+
+  # b. the guard that caught a real two-sites contamination — must be exactly one
+  SL=$(jsq "window.__selLabel()")
+  if [[ "$SL" != "1 site selected" ]]; then
+    echo "  $HANDLE: SELECTOR GUARD FAILED (label reads '$SL') — discarding this site"; continue
+  fi
+
+  # c. information page, then let the widgets settle
+  jsq "window.__goInfo()" >/dev/null
+  sleep 20
+
+  # d. rendered counts
+  RD=$(jsq "window.__domRead()")
+  EXPECT=$(python3 -c "import json,sys;print(json.loads(sys.argv[1])['stb'])" "$RD" 2>/dev/null)
+  CONN=$(python3   -c "import json,sys;print(json.loads(sys.argv[1])['conn'])" "$RD" 2>/dev/null)
+  NOTCONN=$(python3 -c "import json,sys;print(json.loads(sys.argv[1])['notconn'])" "$RD" 2>/dev/null)
+  if [ -z "${EXPECT:-}" ] || [ "$EXPECT" = "None" ]; then
+    echo "  $HANDLE: could not read Online-STBs widget ($RD)"; continue
+  fi
+  echo "  widget: online=$EXPECT pms_conn=$CONN pms_not=$NOTCONN"
+
+  # e. per-device export. Do NOT clear old csvData files — Downloads holds the user's own
+  # unrelated exports. Stamp the clock instead and refuse anything older, so a leftover from
+  # the SAME site cannot be filed as this window's data.
+  CLICKED_AT=$(date +%s)
+  jsq "window.__dlStart()" >/dev/null
+  DLR=""
+  for _ in $(seq 1 10); do
+    sleep 2
+    DLR=$(jsq "window.__dlRes||'PENDING'")
+    [[ "$DLR" != *PENDING* ]] && break
+  done
+  if [[ "$DLR" != *DOWNLOAD_CLICKED* ]]; then
+    echo "  $HANDLE: EXPORT CLICK FAILED ($DLR) — count NOT banked without its export"; continue
+  fi
+
+  CSV=""
+  for _ in $(seq 1 20); do
+    C=$(ls -t "$DL"/csvData*.csv 2>/dev/null | head -1)   # find -newermt does not work on this box
+    if [ -n "$C" ] && [ "$(stat -f %m "$C")" -ge "$CLICKED_AT" ]; then CSV="$C"; break; fi
+    sleep 2
+  done
+  if [ -z "$CSV" ]; then
+    echo "  $HANDLE: widget read $EXPECT but NO FRESH EXPORT — count NOT banked"; continue
+  fi
+
+  # f. guards: right site, and row count == the widget count
+  SITENAME=$(awk -F, 'NR==2{print $4}' "$CSV")
+  ROWS=$(( $(wc -l < "$CSV") - 1 ))
+  SHORT=${LABEL#The }
+  if [[ "$SITENAME" != *"$SHORT"* ]]; then
+    echo "  $HANDLE: SITE MISMATCH (got '$SITENAME') — discarding"; rm -f "$CSV"; continue
+  fi
+  if [ "$ROWS" != "$EXPECT" ]; then
+    echo "  $HANDLE: ROW MISMATCH ($ROWS rows vs widget $EXPECT) — discarding"; rm -f "$CSV"; continue
+  fi
+
+  # g. the window is the export's own timestamp, ceilinged to the 15-min boundary the way the
+  #    API's dateUpto did. Eastern wall clock in, UTC out.
+  TSRAW=$(awk -F, 'NR==2{print $2}' "$CSV")
+  TS=$(echo "$TSRAW" | tr -d ' :-' | sed 's/\(.\{8\}\)\(.\{4\}\).*/\1T\2ET/')
+  W=$(/usr/bin/python3 - "$TSRAW" <<'PY'
+import sys, datetime
+from zoneinfo import ZoneInfo
+d = datetime.datetime.strptime(sys.argv[1].strip(), '%Y-%m-%d %H:%M:%S')
+u = d.replace(tzinfo=ZoneInfo('America/New_York')).astimezone(datetime.timezone.utc)
+u = u.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(minutes=(u.minute // 15 + 1) * 15)
+print(u.strftime('%Y%m%dT%H%M%SZ'))
+PY
+)
+  [ -n "$W" ] && WINDOW="$W"
+
+  TARGET="$PIPE/icx/icx-online-stbs-$HANDLE-$TS.csv"
+  if [ -f "$TARGET" ]; then
+    echo "  $HANDLE: window $TS already banked (iCX has not advanced) — no new data"
+    rm -f "$CSV"
+  else
+    cp "$CSV" "$TARGET"
+    cp "$CSV" "$DROPS/icx-online-stbs/icx-online-stbs-$HANDLE-$TS.csv"
+    mkdir -p "$DL/$HANDLE"; mv "$CSV" "$DL/$HANDLE/icx-online-stbs-$HANDLE-$TS.csv"
+    echo "  $HANDLE: $ROWS boxes @ $TS  (window $W)"
+    NEWDATA=1
+  fi
+
+  # h. site-level health row. The four good/warn/bad triples (RSSI, disruption, reboots, net
+  #    availability) are NOT captured on this path yet — they render only on #/pages/net_stats
+  #    and #/pages/system_performance_1. Left EMPTY, never zero: blank means not measured.
+  if [ -n "$W" ]; then
+    mkdir -p "$DROPS/icx-sweeps/$W"
+    { echo 'mvm_handle,taken_at,online_stbs,pms_connected,pms_not_connected,rssi_good,rssi_warn,rssi_bad,disrupt_good,disrupt_warn,disrupt_bad,reboot_good,reboot_warn,reboot_bad,netavail_good,netavail_warn,netavail_bad'
+      echo "$HANDLE,${W:0:4}-${W:4:2}-${W:6:2}T${W:9:2}:${W:11:2}:${W:13:2}Z,$EXPECT,$CONN,$NOTCONN,,,,,,,,,,,,"
+    } > "$DROPS/icx-sweeps/$W/dish-icx-$(echo "$HANDLE" | tr 'A-Z' 'a-z')-health-$W.csv"
+  fi
+  SITEROWS+=("$HANDLE,$NAME,$EXPECT,$CONN,0,0,$EXPECT,$CONN")
+done
+fi
+
+# ── 2. combined site CSV ───────────────────────────────────────────────────────
+# `${#SITEROWS[@]}` on an empty array trips `set -u` in macOS bash 3.2 — guard the expansion.
+if [ "${#SITEROWS[@]:-0}" -gt 0 ] && [ -n "$WINDOW" ]; then
+  OUT="$DROPS/icx-sweeps/$WINDOW/dish-icx-vacatia3-site-$WINDOW.csv"
+  mkdir -p "$(dirname "$OUT")"
+  { echo 'handle,name,total_devices,pms_connected,s1_total,m1_total,m2_total,m2_pms_connected'
+    printf '%s\n' "${SITEROWS[@]}"; } > "$OUT"
+  echo "wrote $OUT (${#SITEROWS[@]} of 3 sites)"
+fi
+
+# ── 3. rebuild + publish ───────────────────────────────────────────────────────
+[ "$NEWDATA" = "1" ] || echo "no new iCX window this sweep (registry may still have moved)"
+./cycle.sh
+echo "════ dom-sweep done $(date -u '+%H:%M:%SZ') ════"
