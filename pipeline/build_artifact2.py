@@ -143,6 +143,10 @@ PAGE = r"""<meta charset="utf-8">
 .sm-site[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .sm-site:focus-visible,.sm-tile:focus-visible,.sm-f:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sm-hint{font-size:11.5px;color:var(--faint);margin:-4px 0 0}
+.newbar{background:var(--accent);color:var(--panel);border-radius:9px;padding:9px 12px;
+ font-size:13px;font-weight:650;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.newbar button{background:var(--panel);color:var(--accent);border:0;border-radius:7px;
+ padding:6px 14px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;min-height:34px}
 .seg{display:flex;gap:6px}
 .seg:empty{display:none}
 .seg button{flex:1 1 0;min-height:40px;padding:5px 12px;border:1px solid var(--line);
@@ -377,6 +381,7 @@ h2.sm-h+p{margin:0;font-size:12.5px;color:var(--dim)}
  <div class="sm-body">
   <div class="sm-sites" id="smSites" role="group" aria-label="Site"></div>
   <div class="seg" id="smSeg" role="group" aria-label="Punchlist status"></div>
+  <div id="smNew"></div>
   <div class="sm-tiles" id="smTiles" role="group" aria-label="Filter by issue"></div>
   <p class="sm-hint">Tap any figure above to filter the list. Tap it again to clear.</p>
   <div class="sm-row">
@@ -1029,6 +1034,23 @@ $('smAll').onclick=()=>{const Rs=rows();
  render()};
 $('smPrint').onclick=()=>{rows().forEach(r=>open.add(r[R.room]));render();window.print()};
 $('smReset').onclick=()=>{f=null;sk=null;$('smQ').value='';$('smG').value='';render()};
+// ---- "you are looking at a cached page" guard -------------------------------------------
+// This page republishes every 15 minutes and GitHub Pages serves it with a cache header, so a
+// browser will happily show a build from an hour ago with no hint that it has. That cost real
+// confusion today: a fix was live and verified while the screen still showed the old value.
+// A HEAD request is cheap (no 2.6 MB body) and the ETag changes on every publish.
+let ETAG0=null;
+function checkFresh(){
+ fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(r=>{
+  const t=r.headers.get('etag')||r.headers.get('last-modified');
+  if(!t) return;
+  if(ETAG0===null){ETAG0=t;return}
+  if(t!==ETAG0) $('smNew').innerHTML=`<div class="newbar"><span>Newer data has been published
+    &mdash; this page is showing an older build.</span>
+    <button type="button" onclick="location.reload(true)">Refresh</button></div>`;
+ }).catch(()=>{});
+}
+checkFresh(); setInterval(checkFresh,300000);
 $('smQ').addEventListener('input',render);$('smG').addEventListener('change',render);
 render();})();
 </script>
