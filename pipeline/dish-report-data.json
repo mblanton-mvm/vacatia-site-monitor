@@ -14,7 +14,27 @@
    "16:14",
    "16:29",
    "16:59",
-   "17:14"
+   "17:14",
+   "18:29",
+   "18:44",
+   "18:59",
+   "19:14",
+   "19:29",
+   "19:44",
+   "19:59",
+   "20:14",
+   "20:29",
+   "20:44",
+   "20:59",
+   "21:14",
+   "21:29",
+   "21:44",
+   "21:59",
+   "22:14",
+   "22:59",
+   "23:14",
+   "23:44",
+   "23:59"
   ],
   "deltas": [
    {
@@ -304,6 +324,379 @@
       2
      ]
     ]
+   },
+   {
+    "window": "18:29",
+    "online": 779,
+    "lost": 3,
+    "gained": 19,
+    "by": [
+     [
+      "8",
+      1
+     ],
+     [
+      "16",
+      1
+     ],
+     [
+      "12",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "18:44",
+    "online": 777,
+    "lost": 5,
+    "gained": 3,
+    "by": [
+     [
+      "6",
+      1
+     ],
+     [
+      "1",
+      1
+     ],
+     [
+      "8",
+      1
+     ],
+     [
+      "7",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "18:59",
+    "online": 781,
+    "lost": 1,
+    "gained": 5,
+    "by": [
+     [
+      "3",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "19:14",
+    "online": 774,
+    "lost": 8,
+    "gained": 1,
+    "by": [
+     [
+      "7",
+      2
+     ],
+     [
+      "17",
+      2
+     ],
+     [
+      "15",
+      1
+     ],
+     [
+      "12",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "19:29",
+    "online": 777,
+    "lost": 5,
+    "gained": 8,
+    "by": [
+     [
+      "6",
+      2
+     ],
+     [
+      "9",
+      2
+     ],
+     [
+      "12",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "19:44",
+    "online": 776,
+    "lost": 6,
+    "gained": 5,
+    "by": [
+     [
+      "2",
+      2
+     ],
+     [
+      "4",
+      1
+     ],
+     [
+      "12",
+      1
+     ],
+     [
+      "1",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "19:59",
+    "online": 780,
+    "lost": 2,
+    "gained": 6,
+    "by": [
+     [
+      "17",
+      1
+     ],
+     [
+      "3",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "20:14",
+    "online": 775,
+    "lost": 7,
+    "gained": 2,
+    "by": [
+     [
+      "12",
+      2
+     ],
+     [
+      "11",
+      1
+     ],
+     [
+      "15",
+      1
+     ],
+     [
+      "9",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "20:29",
+    "online": 780,
+    "lost": 2,
+    "gained": 7,
+    "by": [
+     [
+      "18",
+      2
+     ]
+    ]
+   },
+   {
+    "window": "20:44",
+    "online": 771,
+    "lost": 11,
+    "gained": 2,
+    "by": [
+     [
+      "10",
+      3
+     ],
+     [
+      "5",
+      3
+     ],
+     [
+      "9",
+      2
+     ],
+     [
+      "16",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "20:59",
+    "online": 782,
+    "lost": 0,
+    "gained": 11,
+    "by": []
+   },
+   {
+    "window": "21:14",
+    "online": 779,
+    "lost": 3,
+    "gained": 0,
+    "by": [
+     [
+      "4",
+      1
+     ],
+     [
+      "2",
+      1
+     ],
+     [
+      "16",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "21:29",
+    "online": 782,
+    "lost": 0,
+    "gained": 3,
+    "by": []
+   },
+   {
+    "window": "21:44",
+    "online": 776,
+    "lost": 6,
+    "gained": 0,
+    "by": [
+     [
+      "2",
+      2
+     ],
+     [
+      "15",
+      1
+     ],
+     [
+      "7",
+      1
+     ],
+     [
+      "8",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "21:59",
+    "online": 781,
+    "lost": 1,
+    "gained": 6,
+    "by": [
+     [
+      "15",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "22:14",
+    "online": 775,
+    "lost": 7,
+    "gained": 1,
+    "by": [
+     [
+      "2",
+      3
+     ],
+     [
+      "11",
+      1
+     ],
+     [
+      "8",
+      1
+     ],
+     [
+      "3",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "22:59",
+    "online": 775,
+    "lost": 7,
+    "gained": 7,
+    "by": [
+     [
+      "15",
+      2
+     ],
+     [
+      "14",
+      2
+     ],
+     [
+      "18",
+      1
+     ],
+     [
+      "2",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "23:14",
+    "online": 773,
+    "lost": 7,
+    "gained": 5,
+    "by": [
+     [
+      "18",
+      1
+     ],
+     [
+      "16",
+      1
+     ],
+     [
+      "5",
+      1
+     ],
+     [
+      "2",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "23:44",
+    "online": 770,
+    "lost": 10,
+    "gained": 7,
+    "by": [
+     [
+      "4",
+      2
+     ],
+     [
+      "12",
+      2
+     ],
+     [
+      "11",
+      1
+     ],
+     [
+      "15",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "23:59",
+    "online": 780,
+    "lost": 0,
+    "gained": 10,
+    "by": []
    }
   ],
   "sust": [
@@ -311,22 +704,52 @@
     "device": "10:2b:aa:50:35:1a",
     "room": "410A@B",
     "seen": 6,
-    "total": 13,
+    "total": 33,
     "worst": {
      "from": "15:29",
-     "to": "17:14",
-     "polls": 6,
-     "minutes": 135,
+     "to": "23:59",
+     "polls": 26,
+     "minutes": 540,
      "trailing": true
     },
     "gaps": 2,
     "last_seen": "14:59"
    },
    {
+    "device": "10:2b:aa:50:31:ed",
+    "room": "1501S@L",
+    "seen": 18,
+    "total": 33,
+    "worst": {
+     "from": "22:59",
+     "to": "23:59",
+     "polls": 4,
+     "minutes": 105,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "22:14"
+   },
+   {
+    "device": "10:2b:aa:50:2f:fe",
+    "room": "1501S@B",
+    "seen": 18,
+    "total": 33,
+    "worst": {
+     "from": "22:59",
+     "to": "23:59",
+     "polls": 4,
+     "minutes": 105,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "22:14"
+   },
+   {
     "device": "10:2b:aa:50:3c:97",
     "room": "209A@B",
-    "seen": 11,
-    "total": 13,
+    "seen": 31,
+    "total": 33,
     "worst": {
      "from": "13:44",
      "to": "14:14",
@@ -335,130 +758,130 @@
      "trailing": false
     },
     "gaps": 1,
-    "last_seen": "17:14"
-   },
-   {
-    "device": "10:2b:aa:50:30:dc",
-    "room": "808A@L",
-    "seen": 11,
-    "total": 13,
-    "worst": {
-     "from": "14:44",
-     "to": "14:59",
-     "polls": 2,
-     "minutes": 75,
-     "trailing": false
-    },
-    "gaps": 1,
-    "last_seen": "17:14"
-   },
-   {
-    "device": "10:2b:aa:50:90:97",
-    "room": "1708A@L",
-    "seen": 11,
-    "total": 13,
-    "worst": {
-     "from": "14:44",
-     "to": "14:59",
-     "polls": 2,
-     "minutes": 75,
-     "trailing": false
-    },
-    "gaps": 1,
-    "last_seen": "17:14"
-   },
-   {
-    "device": "10:2b:aa:50:2c:0e",
-    "room": "507A@B",
-    "seen": 10,
-    "total": 13,
-    "worst": {
-     "from": "14:14",
-     "to": "14:44",
-     "polls": 2,
-     "minutes": 75,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "17:14"
-   },
-   {
-    "device": "10:2b:aa:50:3d:fc",
-    "room": "1712A@L",
-    "seen": 10,
-    "total": 13,
-    "worst": {
-     "from": "14:44",
-     "to": "14:59",
-     "polls": 2,
-     "minutes": 75,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "10:2b:aa:50:8f:68",
-    "room": "211A@B",
-    "seen": 11,
-    "total": 13,
-    "worst": {
-     "from": "14:14",
-     "to": "14:44",
-     "polls": 2,
-     "minutes": 75,
-     "trailing": false
-    },
-    "gaps": 1,
-    "last_seen": "17:14"
-   },
-   {
-    "device": "10:2b:aa:50:35:b6",
-    "room": "1401S@B",
-    "seen": 11,
-    "total": 13,
-    "worst": {
-     "from": "14:14",
-     "to": "14:44",
-     "polls": 2,
-     "minutes": 75,
-     "trailing": false
-    },
-    "gaps": 1,
-    "last_seen": "17:14"
+    "last_seen": "23:59"
    },
    {
     "device": "10:2b:aa:50:35:3b",
     "room": "909A@L",
-    "seen": 10,
-    "total": 13,
+    "seen": 30,
+    "total": 33,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 45,
-     "trailing": true
+     "minutes": 120,
+     "trailing": false
     },
     "gaps": 2,
-    "last_seen": "16:29"
+    "last_seen": "23:59"
    },
    {
     "device": "10:2b:aa:50:8f:50",
     "room": "701S@L",
-    "seen": 11,
-    "total": 13,
+    "seen": 31,
+    "total": 33,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 45,
-     "trailing": true
+     "minutes": 120,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:29"
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:50:30:dc",
+    "room": "808A@L",
+    "seen": 31,
+    "total": 33,
+    "worst": {
+     "from": "14:44",
+     "to": "14:59",
+     "polls": 2,
+     "minutes": 75,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:50:90:97",
+    "room": "1708A@L",
+    "seen": 31,
+    "total": 33,
+    "worst": {
+     "from": "14:44",
+     "to": "14:59",
+     "polls": 2,
+     "minutes": 75,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:50:2c:0e",
+    "room": "507A@B",
+    "seen": 30,
+    "total": 33,
+    "worst": {
+     "from": "14:14",
+     "to": "14:44",
+     "polls": 2,
+     "minutes": 75,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:50:3d:fc",
+    "room": "1712A@L",
+    "seen": 30,
+    "total": 33,
+    "worst": {
+     "from": "14:44",
+     "to": "14:59",
+     "polls": 2,
+     "minutes": 75,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:50:8f:68",
+    "room": "211A@B",
+    "seen": 31,
+    "total": 33,
+    "worst": {
+     "from": "14:14",
+     "to": "14:44",
+     "polls": 2,
+     "minutes": 75,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:50:35:b6",
+    "room": "1401S@B",
+    "seen": 30,
+    "total": 33,
+    "worst": {
+     "from": "14:14",
+     "to": "14:44",
+     "polls": 2,
+     "minutes": 75,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
    }
   ],
-  "devices_ever": 781,
+  "devices_ever": 783,
   "health": {
    "14:15": {
     "mvm_handle": "MVM784",
@@ -517,6 +940,44 @@
     "netavail_warn": "0",
     "netavail_bad": "0"
    },
+   "19:45": {
+    "mvm_handle": "MVM784",
+    "taken_at": "2026-08-03T23:45:00Z",
+    "online_stbs": "776",
+    "pms_connected": "776",
+    "pms_not_connected": "0",
+    "rssi_good": "676",
+    "rssi_warn": "76",
+    "rssi_bad": "24",
+    "disrupt_good": "367",
+    "disrupt_warn": "260",
+    "disrupt_bad": "149",
+    "reboot_good": "775",
+    "reboot_warn": "1",
+    "reboot_bad": "0",
+    "netavail_good": "775",
+    "netavail_warn": "0",
+    "netavail_bad": "1"
+   },
+   "19:30": {
+    "mvm_handle": "MVM784",
+    "taken_at": "2026-08-03T23:30:00Z",
+    "online_stbs": "777",
+    "pms_connected": "777",
+    "pms_not_connected": "0",
+    "rssi_good": "680",
+    "rssi_warn": "73",
+    "rssi_bad": "24",
+    "disrupt_good": "396",
+    "disrupt_warn": "218",
+    "disrupt_bad": "163",
+    "reboot_good": "777",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "777",
+    "netavail_warn": "0",
+    "netavail_bad": "0"
+   },
    "15:00": {
     "mvm_handle": "MVM784",
     "taken_at": "2026-08-03T19:00:00Z",
@@ -552,6 +1013,25 @@
     "reboot_warn": "0",
     "reboot_bad": "0",
     "netavail_good": "776",
+    "netavail_warn": "0",
+    "netavail_bad": "0"
+   },
+   "19:00": {
+    "mvm_handle": "MVM784",
+    "taken_at": "2026-08-03T23:00:00Z",
+    "online_stbs": "781",
+    "pms_connected": "781",
+    "pms_not_connected": "0",
+    "rssi_good": "677",
+    "rssi_warn": "86",
+    "rssi_bad": "18",
+    "disrupt_good": "493",
+    "disrupt_warn": "200",
+    "disrupt_bad": "88",
+    "reboot_good": "781",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "781",
     "netavail_warn": "0",
     "netavail_bad": "0"
    },
@@ -611,6 +1091,44 @@
     "netavail_good": "703",
     "netavail_warn": "0",
     "netavail_bad": "10"
+   },
+   "19:15": {
+    "mvm_handle": "MVM784",
+    "taken_at": "2026-08-03T23:15:00Z",
+    "online_stbs": "774",
+    "pms_connected": "774",
+    "pms_not_connected": "0",
+    "rssi_good": "666",
+    "rssi_warn": "90",
+    "rssi_bad": "18",
+    "disrupt_good": "320",
+    "disrupt_warn": "271",
+    "disrupt_bad": "183",
+    "reboot_good": "774",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "774",
+    "netavail_warn": "0",
+    "netavail_bad": "0"
+   },
+   "18:30": {
+    "mvm_handle": "MVM784",
+    "taken_at": "2026-08-03T22:30:00Z",
+    "online_stbs": "779",
+    "pms_connected": "779",
+    "pms_not_connected": "0",
+    "rssi_good": "675",
+    "rssi_warn": "81",
+    "rssi_bad": "23",
+    "disrupt_good": "415",
+    "disrupt_warn": "225",
+    "disrupt_bad": "139",
+    "reboot_good": "779",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "778",
+    "netavail_warn": "0",
+    "netavail_bad": "1"
    },
    "16:15": {
     "mvm_handle": "MVM784",
@@ -778,7 +1296,27 @@
    762,
    772,
    771,
-   763
+   763,
+   779,
+   777,
+   781,
+   774,
+   777,
+   776,
+   780,
+   775,
+   780,
+   771,
+   782,
+   779,
+   782,
+   776,
+   781,
+   775,
+   775,
+   773,
+   770,
+   780
   ]
  },
  "MVM783": {
@@ -794,7 +1332,27 @@
    "16:14",
    "16:44",
    "16:59",
-   "17:14"
+   "17:14",
+   "18:29",
+   "18:44",
+   "18:59",
+   "19:14",
+   "19:29",
+   "19:44",
+   "19:59",
+   "20:14",
+   "20:29",
+   "20:44",
+   "20:59",
+   "21:14",
+   "21:29",
+   "21:44",
+   "21:59",
+   "22:29",
+   "22:59",
+   "23:29",
+   "23:44",
+   "23:59"
   ],
   "deltas": [
    {
@@ -978,6 +1536,194 @@
       1
      ]
     ]
+   },
+   {
+    "window": "18:29",
+    "online": 4351,
+    "lost": 5,
+    "gained": 263,
+    "by": [
+     [
+      "2",
+      4
+     ],
+     [
+      "62",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "18:44",
+    "online": 4351,
+    "lost": 1,
+    "gained": 1,
+    "by": [
+     [
+      "2",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "18:59",
+    "online": 4350,
+    "lost": 2,
+    "gained": 1,
+    "by": [
+     [
+      "61",
+      1
+     ],
+     [
+      "?",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "19:14",
+    "online": 4351,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "19:29",
+    "online": 4350,
+    "lost": 1,
+    "gained": 0,
+    "by": [
+     [
+      "81",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "19:44",
+    "online": 4351,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "19:59",
+    "online": 4351,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "20:14",
+    "online": 4350,
+    "lost": 1,
+    "gained": 0,
+    "by": [
+     [
+      "21",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "20:29",
+    "online": 4351,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "20:44",
+    "online": 4350,
+    "lost": 1,
+    "gained": 0,
+    "by": [
+     [
+      "2",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "20:59",
+    "online": 4351,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "21:14",
+    "online": 4352,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "21:29",
+    "online": 4352,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "21:44",
+    "online": 4352,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "21:59",
+    "online": 4352,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "22:29",
+    "online": 4352,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "22:59",
+    "online": 4351,
+    "lost": 1,
+    "gained": 0,
+    "by": [
+     [
+      "41",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "23:29",
+    "online": 4351,
+    "lost": 1,
+    "gained": 1,
+    "by": [
+     [
+      "5",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "23:44",
+    "online": 4351,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "23:59",
+    "online": 4351,
+    "lost": 0,
+    "gained": 0,
+    "by": []
    }
   ],
   "sust": [
@@ -985,12 +1731,12 @@
     "device": "68:ab:a9:fc:97:49",
     "room": "2501B",
     "seen": 4,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "14:59",
-     "to": "17:14",
-     "polls": 7,
-     "minutes": 150,
+     "to": "23:59",
+     "polls": 27,
+     "minutes": 555,
      "trailing": true
     },
     "gaps": 1,
@@ -1000,12 +1746,12 @@
     "device": "68:ab:a9:fc:20:bd",
     "room": "21204B",
     "seen": 5,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "15:44",
-     "to": "17:14",
-     "polls": 6,
-     "minutes": 135,
+     "to": "23:59",
+     "polls": 26,
+     "minutes": 540,
      "trailing": true
     },
     "gaps": 1,
@@ -1015,12 +1761,12 @@
     "device": "68:ab:a9:fe:d0:d3",
     "room": "21104A",
     "seen": 5,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "15:44",
-     "to": "17:14",
-     "polls": 6,
-     "minutes": 135,
+     "to": "23:59",
+     "polls": 26,
+     "minutes": 540,
      "trailing": true
     },
     "gaps": 1,
@@ -1030,12 +1776,12 @@
     "device": "68:ab:a9:fb:4b:87",
     "room": "2804B",
     "seen": 6,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "15:59",
-     "to": "17:14",
-     "polls": 5,
-     "minutes": 90,
+     "to": "23:59",
+     "polls": 25,
+     "minutes": 495,
      "trailing": true
     },
     "gaps": 1,
@@ -1045,12 +1791,12 @@
     "device": "68:ab:a9:fc:29:f6",
     "room": "2102A",
     "seen": 6,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "15:59",
-     "to": "17:14",
-     "polls": 5,
-     "minutes": 90,
+     "to": "23:59",
+     "polls": 25,
+     "minutes": 495,
      "trailing": true
     },
     "gaps": 1,
@@ -1060,42 +1806,27 @@
     "device": "68:ab:a9:fe:6d:49",
     "room": "2801B",
     "seen": 6,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "15:59",
-     "to": "17:14",
-     "polls": 5,
-     "minutes": 90,
+     "to": "23:59",
+     "polls": 25,
+     "minutes": 495,
      "trailing": true
     },
     "gaps": 1,
     "last_seen": "15:44"
    },
    {
-    "device": "10:2b:aa:51:63:5a",
-    "room": "GYM3",
-    "seen": 4,
-    "total": 11,
-    "worst": {
-     "from": "13:44",
-     "to": "14:59",
-     "polls": 4,
-     "minutes": 210,
-     "trailing": false
-    },
-    "gaps": 3,
-    "last_seen": "16:44"
-   },
-   {
     "device": "10:2b:aa:51:fc:40",
     "room": "1805A@B",
     "seen": 7,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "16:14",
-     "to": "17:14",
-     "polls": 4,
-     "minutes": 75,
+     "to": "23:59",
+     "polls": 24,
+     "minutes": 480,
      "trailing": true
     },
     "gaps": 1,
@@ -1105,12 +1836,12 @@
     "device": "10:2b:aa:51:52:9b",
     "room": "51102A",
     "seen": 5,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "16:14",
-     "to": "17:14",
-     "polls": 4,
-     "minutes": 75,
+     "to": "23:59",
+     "polls": 24,
+     "minutes": 480,
      "trailing": true
     },
     "gaps": 1,
@@ -1120,252 +1851,27 @@
     "device": "68:ab:a9:f8:d1:a9",
     "room": "2701B",
     "seen": 6,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "16:44",
-     "to": "17:14",
-     "polls": 3,
-     "minutes": 60,
+     "to": "23:59",
+     "polls": 23,
+     "minutes": 465,
      "trailing": true
     },
     "gaps": 2,
     "last_seen": "16:14"
-   },
-   {
-    "device": "10:2b:aa:51:4f:ec",
-    "room": "GYM1",
-    "seen": 7,
-    "total": 11,
-    "worst": {
-     "from": "16:44",
-     "to": "17:14",
-     "polls": 3,
-     "minutes": 60,
-     "trailing": true
-    },
-    "gaps": 1,
-    "last_seen": "16:14"
-   },
-   {
-    "device": "68:ab:a9:fc:46:58",
-    "room": "1506B@L",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "10:2b:aa:52:66:0f",
-    "room": "11203A",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "68:ab:a9:f8:ee:1b",
-    "room": "1104A",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "68:ab:a9:fc:34:e5",
-    "room": "1501B",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "10:2b:aa:51:fc:4c",
-    "room": "1804B@L",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "68:ab:a9:fc:49:56",
-    "room": "1407B@B",
-    "seen": 9,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 1,
-    "last_seen": "17:14"
-   },
-   {
-    "device": "68:ab:a9:f8:d4:1d",
-    "room": "1905B",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "68:ab:a9:fc:3d:f3",
-    "room": "11101B",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "68:ab:a9:fe:9c:2d",
-    "room": "1102A@B",
-    "seen": 9,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 1,
-    "last_seen": "17:14"
-   },
-   {
-    "device": "68:ab:a9:fc:1a:6a",
-    "room": "1605A",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "68:ab:a9:fc:1a:fd",
-    "room": "1106A",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
-   },
-   {
-    "device": "68:ab:a9:fc:97:07",
-    "room": "1602B",
-    "seen": 8,
-    "total": 11,
-    "worst": {
-     "from": "15:59",
-     "to": "16:14",
-     "polls": 2,
-     "minutes": 60,
-     "trailing": false
-    },
-    "gaps": 2,
-    "last_seen": "16:59"
    },
    {
     "device": "10:2b:aa:52:65:4f",
     "room": "2604A",
     "seen": 9,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "16:59",
-     "to": "17:14",
-     "polls": 2,
-     "minutes": 30,
-     "trailing": true
-    },
-    "gaps": 1,
-    "last_seen": "16:44"
-   },
-   {
-    "device": "10:2b:aa:51:4e:ba",
-    "room": "1301B@B",
-    "seen": 9,
-    "total": 11,
-    "worst": {
-     "from": "16:59",
-     "to": "17:14",
-     "polls": 2,
-     "minutes": 30,
-     "trailing": true
-    },
-    "gaps": 1,
-    "last_seen": "16:44"
-   },
-   {
-    "device": "68:ab:a9:fb:86:19",
-    "room": "1104A",
-    "seen": 9,
-    "total": 11,
-    "worst": {
-     "from": "16:59",
-     "to": "17:14",
-     "polls": 2,
-     "minutes": 30,
+     "to": "23:59",
+     "polls": 22,
+     "minutes": 435,
      "trailing": true
     },
     "gaps": 1,
@@ -1375,184 +1881,559 @@
     "device": "10:2b:aa:51:fb:f2",
     "room": "2901A",
     "seen": 9,
-    "total": 11,
+    "total": 31,
     "worst": {
      "from": "16:59",
-     "to": "17:14",
-     "polls": 2,
-     "minutes": 30,
+     "to": "23:59",
+     "polls": 22,
+     "minutes": 435,
      "trailing": true
     },
     "gaps": 1,
     "last_seen": "16:44"
+   },
+   {
+    "device": "10:2b:aa:51:f8:bc",
+    "room": "1507B",
+    "seen": 10,
+    "total": 31,
+    "worst": {
+     "from": "17:14",
+     "to": "23:59",
+     "polls": 21,
+     "minutes": 420,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "16:59"
+   },
+   {
+    "device": "10:2b:aa:51:4e:21",
+    "room": "EVOLVE",
+    "seen": 8,
+    "total": 31,
+    "worst": {
+     "from": "17:14",
+     "to": "23:59",
+     "polls": 21,
+     "minutes": 420,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "16:59"
+   },
+   {
+    "device": "10:2b:aa:51:f8:41",
+    "room": "2303A",
+    "seen": 11,
+    "total": 31,
+    "worst": {
+     "from": "18:29",
+     "to": "23:59",
+     "polls": 20,
+     "minutes": 405,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "17:14"
+   },
+   {
+    "device": "10:2b:aa:51:fc:bb",
+    "room": "2304B",
+    "seen": 11,
+    "total": 31,
+    "worst": {
+     "from": "18:29",
+     "to": "23:59",
+     "polls": 20,
+     "minutes": 405,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "17:14"
+   },
+   {
+    "device": "10:2b:aa:52:65:70",
+    "room": "2603B",
+    "seen": 11,
+    "total": 31,
+    "worst": {
+     "from": "18:29",
+     "to": "23:59",
+     "polls": 20,
+     "minutes": 405,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "17:14"
+   },
+   {
+    "device": "68:ab:a9:fc:a0:95",
+    "room": "2902B",
+    "seen": 11,
+    "total": 31,
+    "worst": {
+     "from": "18:29",
+     "to": "23:59",
+     "polls": 20,
+     "minutes": 405,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "17:14"
+   },
+   {
+    "device": "68:ab:a9:fc:1d:db",
+    "room": "2101A",
+    "seen": 12,
+    "total": 31,
+    "worst": {
+     "from": "18:44",
+     "to": "23:59",
+     "polls": 19,
+     "minutes": 330,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "18:29"
+   },
+   {
+    "device": "10:2b:aa:51:63:b4",
+    "room": "GYM2",
+    "seen": 21,
+    "total": 31,
+    "worst": {
+     "from": "18:59",
+     "to": "20:59",
+     "polls": 9,
+     "minutes": 150,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:51:4f:ec",
+    "room": "GYM1",
+    "seen": 25,
+    "total": 31,
+    "worst": {
+     "from": "16:44",
+     "to": "18:44",
+     "polls": 5,
+     "minutes": 165,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:51:63:5a",
+    "room": "GYM3",
+    "seen": 24,
+    "total": 31,
+    "worst": {
+     "from": "13:44",
+     "to": "14:59",
+     "polls": 4,
+     "minutes": 210,
+     "trailing": false
+    },
+    "gaps": 3,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:51:5e:b9",
+    "room": "5607A",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "23:29",
+     "to": "23:59",
+     "polls": 3,
+     "minutes": 60,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "22:59"
+   },
+   {
+    "device": "10:2b:aa:51:4e:ba",
+    "room": "1301B@B",
+    "seen": 29,
+    "total": 31,
+    "worst": {
+     "from": "16:59",
+     "to": "17:14",
+     "polls": 2,
+     "minutes": 105,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fb:86:19",
+    "room": "1104A",
+    "seen": 29,
+    "total": 31,
+    "worst": {
+     "from": "16:59",
+     "to": "17:14",
+     "polls": 2,
+     "minutes": 105,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:fc:21:b5",
     "room": "1108B",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:f8:d7:40",
     "room": "1404B@B",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:f8:f2:9e",
     "room": "11004A",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:fe:f8:6a",
     "room": "1804A",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:f8:27:42",
     "room": "1407A@L",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "10:2b:aa:51:f4:81",
     "room": "11202B",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:f8:ed:89",
     "room": "11008A",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:fc:25:de",
     "room": "1207B@B",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:f8:dc:89",
     "room": "1406A@L",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:fb:aa:2c",
     "room": "1108A",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
    },
    {
     "device": "68:ab:a9:f7:f8:16",
     "room": "1501A@B",
-    "seen": 9,
-    "total": 11,
+    "seen": 29,
+    "total": 31,
     "worst": {
      "from": "16:59",
      "to": "17:14",
      "polls": 2,
-     "minutes": 30,
-     "trailing": true
+     "minutes": 105,
+     "trailing": false
     },
     "gaps": 1,
-    "last_seen": "16:44"
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fc:46:58",
+    "room": "1506B@L",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:52:66:0f",
+    "room": "11203A",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:f8:ee:1b",
+    "room": "1104A",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fc:34:e5",
+    "room": "1501B",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "10:2b:aa:51:fc:4c",
+    "room": "1804B@L",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fc:49:56",
+    "room": "1407B@B",
+    "seen": 29,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:f8:d4:1d",
+    "room": "1905B",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fc:3d:f3",
+    "room": "11101B",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fe:9c:2d",
+    "room": "1102A@B",
+    "seen": 29,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fc:1a:6a",
+    "room": "1605A",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fc:1a:fd",
+    "room": "1106A",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "68:ab:a9:fc:97:07",
+    "room": "1602B",
+    "seen": 28,
+    "total": 31,
+    "worst": {
+     "from": "15:59",
+     "to": "16:14",
+     "polls": 2,
+     "minutes": 60,
+     "trailing": false
+    },
+    "gaps": 2,
+    "last_seen": "23:59"
    }
   ],
-  "devices_ever": 4369,
+  "devices_ever": 4370,
   "health": {
    "14:15": {
     "mvm_handle": "MVM783",
@@ -1591,6 +2472,44 @@
     "netavail_good": "4330",
     "netavail_warn": "0",
     "netavail_bad": "0"
+   },
+   "19:45": {
+    "mvm_handle": "MVM783",
+    "taken_at": "2026-08-03T23:45:00Z",
+    "online_stbs": "4351",
+    "pms_connected": "4349",
+    "pms_not_connected": "2",
+    "rssi_good": "4214",
+    "rssi_warn": "135",
+    "rssi_bad": "2",
+    "disrupt_good": "4332",
+    "disrupt_warn": "11",
+    "disrupt_bad": "8",
+    "reboot_good": "4345",
+    "reboot_warn": "6",
+    "reboot_bad": "0",
+    "netavail_good": "4338",
+    "netavail_warn": "0",
+    "netavail_bad": "2"
+   },
+   "19:30": {
+    "mvm_handle": "MVM783",
+    "taken_at": "2026-08-03T23:30:00Z",
+    "online_stbs": "4350",
+    "pms_connected": "4348",
+    "pms_not_connected": "2",
+    "rssi_good": "4211",
+    "rssi_warn": "137",
+    "rssi_bad": "2",
+    "disrupt_good": "4331",
+    "disrupt_warn": "15",
+    "disrupt_bad": "4",
+    "reboot_good": "4349",
+    "reboot_warn": "1",
+    "reboot_bad": "0",
+    "netavail_good": "4334",
+    "netavail_warn": "0",
+    "netavail_bad": "5"
    },
    "15:45": {
     "mvm_handle": "MVM783",
@@ -1649,6 +2568,25 @@
     "netavail_warn": "0",
     "netavail_bad": "2"
    },
+   "19:00": {
+    "mvm_handle": "MVM783",
+    "taken_at": "2026-08-03T23:00:00Z",
+    "online_stbs": "4350",
+    "pms_connected": "4348",
+    "pms_not_connected": "2",
+    "rssi_good": "4206",
+    "rssi_warn": "142",
+    "rssi_bad": "2",
+    "disrupt_good": "4332",
+    "disrupt_warn": "9",
+    "disrupt_bad": "9",
+    "reboot_good": "4344",
+    "reboot_warn": "6",
+    "reboot_bad": "0",
+    "netavail_good": "4334",
+    "netavail_warn": "1",
+    "netavail_bad": "4"
+   },
    "11:45": {
     "mvm_handle": "MVM783",
     "taken_at": "2026-08-03T15:45:00Z",
@@ -1705,6 +2643,63 @@
     "netavail_good": "4336",
     "netavail_warn": "0",
     "netavail_bad": "18"
+   },
+   "19:15": {
+    "mvm_handle": "MVM783",
+    "taken_at": "2026-08-03T23:15:00Z",
+    "online_stbs": "4351",
+    "pms_connected": "4349",
+    "pms_not_connected": "2",
+    "rssi_good": "4210",
+    "rssi_warn": "139",
+    "rssi_bad": "2",
+    "disrupt_good": "4339",
+    "disrupt_warn": "7",
+    "disrupt_bad": "5",
+    "reboot_good": "4348",
+    "reboot_warn": "3",
+    "reboot_bad": "0",
+    "netavail_good": "4336",
+    "netavail_warn": "0",
+    "netavail_bad": "4"
+   },
+   "18:30": {
+    "mvm_handle": "MVM783",
+    "taken_at": "2026-08-03T22:30:00Z",
+    "online_stbs": "4351",
+    "pms_connected": "4348",
+    "pms_not_connected": "3",
+    "rssi_good": "4209",
+    "rssi_warn": "139",
+    "rssi_bad": "2",
+    "disrupt_good": "4337",
+    "disrupt_warn": "10",
+    "disrupt_bad": "4",
+    "reboot_good": "4346",
+    "reboot_warn": "5",
+    "reboot_bad": "0",
+    "netavail_good": "4331",
+    "netavail_warn": "0",
+    "netavail_bad": "9"
+   },
+   "18:45": {
+    "mvm_handle": "MVM783",
+    "taken_at": "2026-08-03T22:45:00Z",
+    "online_stbs": "4351",
+    "pms_connected": "4348",
+    "pms_not_connected": "3",
+    "rssi_good": "4216",
+    "rssi_warn": "133",
+    "rssi_bad": "2",
+    "disrupt_good": "4341",
+    "disrupt_warn": "5",
+    "disrupt_bad": "5",
+    "reboot_good": "4349",
+    "reboot_warn": "2",
+    "reboot_bad": "0",
+    "netavail_good": "4337",
+    "netavail_warn": "0",
+    "netavail_bad": "3"
    },
    "16:15": {
     "mvm_handle": "MVM783",
@@ -1870,7 +2865,27 @@
    4312,
    4342,
    4340,
-   4093
+   4093,
+   4351,
+   4351,
+   4350,
+   4351,
+   4350,
+   4351,
+   4351,
+   4350,
+   4351,
+   4350,
+   4351,
+   4352,
+   4352,
+   4352,
+   4352,
+   4352,
+   4351,
+   4351,
+   4351,
+   4351
   ]
  },
  "MVM743": {
@@ -1887,7 +2902,27 @@
    "16:14",
    "16:44",
    "16:59",
-   "17:14"
+   "17:14",
+   "18:29",
+   "18:44",
+   "18:59",
+   "19:14",
+   "19:29",
+   "19:44",
+   "19:59",
+   "20:14",
+   "20:29",
+   "20:44",
+   "20:59",
+   "21:14",
+   "21:29",
+   "21:44",
+   "21:59",
+   "22:44",
+   "22:59",
+   "23:14",
+   "23:44",
+   "23:59"
   ],
   "deltas": [
    {
@@ -2008,34 +3043,188 @@
       1
      ]
     ]
+   },
+   {
+    "window": "18:29",
+    "online": 458,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "18:44",
+    "online": 458,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "18:59",
+    "online": 458,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "19:14",
+    "online": 457,
+    "lost": 1,
+    "gained": 0,
+    "by": [
+     [
+      "20",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "19:29",
+    "online": 458,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "19:44",
+    "online": 457,
+    "lost": 1,
+    "gained": 0,
+    "by": [
+     [
+      "10",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "19:59",
+    "online": 458,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "20:14",
+    "online": 458,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "20:29",
+    "online": 457,
+    "lost": 1,
+    "gained": 0,
+    "by": [
+     [
+      "20",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "20:44",
+    "online": 458,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "20:59",
+    "online": 458,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "21:14",
+    "online": 458,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "21:29",
+    "online": 458,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "21:44",
+    "online": 458,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "21:59",
+    "online": 458,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "22:44",
+    "online": 458,
+    "lost": 2,
+    "gained": 2,
+    "by": [
+     [
+      "20",
+      1
+     ],
+     [
+      "10",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "22:59",
+    "online": 459,
+    "lost": 0,
+    "gained": 1,
+    "by": []
+   },
+   {
+    "window": "23:14",
+    "online": 459,
+    "lost": 0,
+    "gained": 0,
+    "by": []
+   },
+   {
+    "window": "23:44",
+    "online": 458,
+    "lost": 1,
+    "gained": 0,
+    "by": [
+     [
+      "20",
+      1
+     ]
+    ]
+   },
+   {
+    "window": "23:59",
+    "online": 459,
+    "lost": 0,
+    "gained": 1,
+    "by": []
    }
   ],
   "sust": [
    {
-    "device": "18:0c:7a:8a:85:f9",
-    "room": "1082 B1",
-    "seen": 2,
-    "total": 12,
-    "worst": {
-     "from": "13:59",
-     "to": "17:14",
-     "polls": 10,
-     "minutes": 300,
-     "trailing": true
-    },
-    "gaps": 1,
-    "last_seen": "12:14"
-   },
-   {
     "device": "38:e1:f4:48:83:9d",
     "room": "2026",
     "seen": 2,
-    "total": 12,
+    "total": 32,
     "worst": {
      "from": "13:59",
-     "to": "17:14",
-     "polls": 10,
-     "minutes": 300,
+     "to": "23:59",
+     "polls": 30,
+     "minutes": 705,
      "trailing": true
     },
     "gaps": 1,
@@ -2045,27 +3234,12 @@
     "device": "38:e1:f4:48:db:14",
     "room": "1083",
     "seen": 2,
-    "total": 12,
+    "total": 32,
     "worst": {
      "from": "13:59",
-     "to": "17:14",
-     "polls": 10,
-     "minutes": 300,
-     "trailing": true
-    },
-    "gaps": 1,
-    "last_seen": "12:14"
-   },
-   {
-    "device": "38:e1:f4:48:82:04",
-    "room": "1082",
-    "seen": 2,
-    "total": 12,
-    "worst": {
-     "from": "13:59",
-     "to": "17:14",
-     "polls": 10,
-     "minutes": 300,
+     "to": "23:59",
+     "polls": 30,
+     "minutes": 705,
      "trailing": true
     },
     "gaps": 1,
@@ -2075,22 +3249,67 @@
     "device": "38:e1:f4:48:8d:0c",
     "room": "1002",
     "seen": 3,
-    "total": 12,
+    "total": 32,
     "worst": {
      "from": "14:14",
-     "to": "17:14",
-     "polls": 9,
-     "minutes": 195,
+     "to": "23:59",
+     "polls": 29,
+     "minutes": 600,
      "trailing": true
     },
     "gaps": 1,
     "last_seen": "13:59"
    },
    {
+    "device": "18:0c:7a:8a:85:f9",
+    "room": "1082 B1",
+    "seen": 7,
+    "total": 32,
+    "worst": {
+     "from": "13:59",
+     "to": "21:59",
+     "polls": 25,
+     "minutes": 630,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "38:e1:f4:48:82:04",
+    "room": "1082",
+    "seen": 7,
+    "total": 32,
+    "worst": {
+     "from": "13:59",
+     "to": "21:59",
+     "polls": 25,
+     "minutes": 630,
+     "trailing": false
+    },
+    "gaps": 1,
+    "last_seen": "23:59"
+   },
+   {
+    "device": "8c:9a:8f:d9:f1:03",
+    "room": "2041",
+    "seen": 27,
+    "total": 32,
+    "worst": {
+     "from": "22:44",
+     "to": "23:59",
+     "polls": 5,
+     "minutes": 120,
+     "trailing": true
+    },
+    "gaps": 1,
+    "last_seen": "21:59"
+   },
+   {
     "device": "8c:9a:8f:d9:f5:d1",
     "room": "16",
-    "seen": 10,
-    "total": 12,
+    "seen": 30,
+    "total": 32,
     "worst": {
      "from": "13:59",
      "to": "14:14",
@@ -2099,7 +3318,7 @@
      "trailing": false
     },
     "gaps": 1,
-    "last_seen": "17:14"
+    "last_seen": "23:59"
    }
   ],
   "devices_ever": 463,
@@ -2141,6 +3360,44 @@
     "netavail_good": "458",
     "netavail_warn": "0",
     "netavail_bad": "0"
+   },
+   "19:45": {
+    "mvm_handle": "MVM743",
+    "taken_at": "2026-08-03T23:45:00Z",
+    "online_stbs": "457",
+    "pms_connected": "457",
+    "pms_not_connected": "0",
+    "rssi_good": "396",
+    "rssi_warn": "43",
+    "rssi_bad": "18",
+    "disrupt_good": "385",
+    "disrupt_warn": "6",
+    "disrupt_bad": "66",
+    "reboot_good": "457",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "456",
+    "netavail_warn": "0",
+    "netavail_bad": "0"
+   },
+   "19:30": {
+    "mvm_handle": "MVM743",
+    "taken_at": "2026-08-03T23:30:00Z",
+    "online_stbs": "458",
+    "pms_connected": "458",
+    "pms_not_connected": "0",
+    "rssi_good": "393",
+    "rssi_warn": "45",
+    "rssi_bad": "20",
+    "disrupt_good": "394",
+    "disrupt_warn": "16",
+    "disrupt_bad": "48",
+    "reboot_good": "458",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "456",
+    "netavail_warn": "0",
+    "netavail_bad": "1"
    },
    "15:45": {
     "mvm_handle": "MVM743",
@@ -2197,6 +3454,25 @@
     "reboot_bad": "0",
     "netavail_good": "456",
     "netavail_warn": "1",
+    "netavail_bad": "0"
+   },
+   "19:00": {
+    "mvm_handle": "MVM743",
+    "taken_at": "2026-08-03T23:00:00Z",
+    "online_stbs": "458",
+    "pms_connected": "458",
+    "pms_not_connected": "0",
+    "rssi_good": "396",
+    "rssi_warn": "43",
+    "rssi_bad": "19",
+    "disrupt_good": "397",
+    "disrupt_warn": "20",
+    "disrupt_bad": "41",
+    "reboot_good": "458",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "457",
+    "netavail_warn": "0",
     "netavail_bad": "0"
    },
    "11:45": {
@@ -2274,6 +3550,63 @@
     "netavail_good": "454",
     "netavail_warn": "0",
     "netavail_bad": "0"
+   },
+   "19:15": {
+    "mvm_handle": "MVM743",
+    "taken_at": "2026-08-03T23:15:00Z",
+    "online_stbs": "457",
+    "pms_connected": "457",
+    "pms_not_connected": "0",
+    "rssi_good": "396",
+    "rssi_warn": "44",
+    "rssi_bad": "17",
+    "disrupt_good": "394",
+    "disrupt_warn": "16",
+    "disrupt_bad": "47",
+    "reboot_good": "457",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "456",
+    "netavail_warn": "0",
+    "netavail_bad": "0"
+   },
+   "18:30": {
+    "mvm_handle": "MVM743",
+    "taken_at": "2026-08-03T22:30:00Z",
+    "online_stbs": "458",
+    "pms_connected": "458",
+    "pms_not_connected": "0",
+    "rssi_good": "398",
+    "rssi_warn": "42",
+    "rssi_bad": "18",
+    "disrupt_good": "396",
+    "disrupt_warn": "22",
+    "disrupt_bad": "40",
+    "reboot_good": "458",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "457",
+    "netavail_warn": "0",
+    "netavail_bad": "0"
+   },
+   "18:45": {
+    "mvm_handle": "MVM743",
+    "taken_at": "2026-08-03T22:45:00Z",
+    "online_stbs": "458",
+    "pms_connected": "458",
+    "pms_not_connected": "0",
+    "rssi_good": "400",
+    "rssi_warn": "39",
+    "rssi_bad": "19",
+    "disrupt_good": "397",
+    "disrupt_warn": "16",
+    "disrupt_bad": "45",
+    "reboot_good": "458",
+    "reboot_warn": "0",
+    "reboot_bad": "0",
+    "netavail_good": "455",
+    "netavail_warn": "0",
+    "netavail_bad": "2"
    },
    "16:15": {
     "mvm_handle": "MVM743",
@@ -2421,7 +3754,27 @@
    456,
    456,
    457,
-   457
+   457,
+   458,
+   458,
+   458,
+   457,
+   458,
+   457,
+   458,
+   458,
+   457,
+   458,
+   458,
+   458,
+   458,
+   458,
+   458,
+   458,
+   459,
+   459,
+   458,
+   459
   ]
  }
 }

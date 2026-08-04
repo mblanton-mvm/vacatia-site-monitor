@@ -169,19 +169,21 @@ NARR = {
   'verdict': 'Site-wide intermittent drop-off, no spatial pattern',
   'sev': 'watch',
   'body': [
-   ("Berkley's box count moved within a 714–774 band across thirteen polls, a swing of 60 boxes "
-    "(7.7% of the fleet). The deepest point was 14:44 ET at 714 online; it recovered to 774 by "
-    "15:29 ET without intervention and has held 763–772 since."),
+   ("Berkley's box count moved within a 714–782 band across thirty-three polls, a swing of 68 boxes "
+    "(8.7% of the fleet). The deepest point was 14:44 ET at 714 online; it recovered to 774 by "
+    "15:29 ET without intervention and spent the entire evening and overnight period between 770 "
+    "and 782, finishing the day at 780."),
    ("The losses are spread evenly across every floor in the tower — at the 14:44 ET trough the 61 "
     "missing boxes came from at least ten different floors, with no floor contributing more than "
     "eight. <strong>That argues against a single access point, switch or riser</strong> and points "
     "instead at something acting on the whole property at once. Confidence: high, on the basis that "
-    "the same distributed shape repeats in every one of the thirteen polls."),
-   ("Separately, iCX's own NET_DISRUPTION_COUNT flags 425 of 763 boxes (56%) as 'bad' in the "
-    "21:15 UTC window, and has stayed in the 132–652 range all day. We treat this counter as noisy "
-    "and are not reporting it as a fault; we would welcome DISH's read on what threshold drives it, "
-    "because at 56% of the fleet it is either telling us something real or it is not usable as a "
-    "signal."),
+    "the same distributed shape repeats across all thirty-three polls."),
+   ("Separately, iCX's own NET_DISRUPTION_COUNT is not usable as a signal at this site, and we want to "
+    "flag that rather than quietly ignore it. Across 34 windows it ranged from <strong>88 to 652 boxes "
+    "flagged 'bad' — 11% to 83% of the fleet</strong> — while the online count moved by at most eight "
+    "boxes over the same stretch. The two are uncorrelated. We are not reporting it as a fault, but we "
+    "would welcome DISH's read on what threshold drives it, because a counter that swings across most "
+    "of the fleet while nothing else moves cannot be acted on."),
   ],
   'ask': ("Berkley is the site we would most like DISH's help on. The distributed shape means the "
           "next useful step is above the individual box — we are asking whether DISH sees anything "
@@ -205,11 +207,11 @@ NARR = {
   ],
  },
  'MVM783': {
-  'verdict': 'Buildings 1 and 11 degraded progressively, then collapsed',
+  'verdict': 'Buildings 1 and 11 collapsed, then self-recovered after ~75 minutes',
   'sev': 'urgent',
   'body': [
    ("This is the clearest and most actionable finding in today's data. Grandview held 4,340–4,367 "
-    "boxes online from midday through 16:59 ET. At the 17:14 ET poll it fell to 4,093 — a loss of "
+    "boxes online from midday through 16:59 ET across thirty-one polls. At the 17:14 ET poll it fell to 4,093 — a loss of "
     "250 boxes in a single fifteen-minute window, the largest movement recorded at any of the three "
     "sites today."),
    ("<strong>The loss is almost entirely confined to two buildings.</strong> Building 1 lost 185 of "
@@ -224,14 +226,28 @@ NARR = {
     "degrading and then failing, rather than with box-level faults. Confidence: high, on the strength "
     "of a monotonic four-hour escalation inside one spatial cluster while twenty peers stayed flat. "
     "We have not yet identified the specific shared element and are not asserting one."),
-   ("This event was still in progress when this report was generated, so the boxes lost at 17:14 ET "
-    "have only missed a single poll so far and do not yet appear in the back-to-back table below. "
-    "The 38 devices that do appear there are the earlier, slower phase of the same pattern."),
+   ("<strong>It recovered on its own.</strong> By the 18:29 ET poll the count was back to 4,351 — "
+    "194 boxes returned in building 1 and 64 in building 11. Both buildings finished <em>above</em> "
+    "their pre-event baseline (286 and 92 against 276 and 87), because some boxes that had been dark "
+    "earlier in the day came back at the same time. Total duration roughly 75 minutes, 17:14 to "
+    "18:29 ET, with no intervention from either side."),
+   ("It has stayed healthy since. Across the twenty-plus polls from 18:29 ET through 09:00 ET the "
+    "next morning the count held 4,350–4,352, RSSI-anomalous fell from 135 boxes to <strong>zero</strong>, "
+    "and degraded net-availability fell from 132 boxes to nought or one. Nothing has recurred."),
+   ("<strong>Why we are still raising it.</strong> A fault that clears itself without anyone touching "
+    "it has not been diagnosed — it has only stopped. The escalation pattern beforehand was four hours "
+    "long and strictly confined to two buildings, which is not the shape of a transient. We would like "
+    "to understand what recovered, so that if it returns we are not starting from zero."),
+   ("Because the event resolved inside the polling day, the boxes lost at 17:14 ET returned before "
+    "missing two consecutive polls, so they do not appear in the back-to-back table below. The 38 "
+    "devices that do appear there are the earlier, slower phase of the same pattern."),
   ],
   'ask': ("We would like DISH to look at the <strong>wired path serving buildings 1 and 11</strong> at "
-          "Grandview — uplink, IDF switch or gateway — from 15:44 ET onward. Based on the evidence "
-          "below we would specifically <em>de-prioritise</em> the access points and RF in those "
-          "buildings, and we would not start with the set-top boxes themselves."),
+          "Grandview — uplink, IDF switch or gateway — across the 15:44–18:29 ET window. Based on the "
+          "evidence below we would specifically <em>de-prioritise</em> the access points and RF in "
+          "those buildings, and we would not start with the set-top boxes themselves. The site is "
+          "healthy now, so this is a post-mortem rather than an emergency: the question is what failed "
+          "and what restored it, so a recurrence is recognisable immediately."),
   'why': [
    ("We pulled per-device telemetry at 17:23–17:29 ET, while the event was still running, and it "
     "identifies the layer. Three independent signals, and they do not agree by accident:"),
@@ -263,9 +279,10 @@ NARR = {
   'verdict': 'Stable; five boxes dark since 13:59 ET',
   'sev': 'ok',
   'body': [
-   ("The Cliffs was the quietest of the three sites. The count sat between 451 and 458 across twelve "
-    "polls and finished at 457, the day's high. Per-window losses were between zero and eight, and "
-    "most windows lost nothing at all."),
+   ("The Cliffs was the quietest of the three sites by a wide margin. Across thirty-two polls the "
+    "count sat between 451 and 459 — a total swing of eight boxes, under 2% of the fleet — and "
+    "finished at 459, the day's high. Per-window losses were between zero and eight, and most "
+    "windows lost nothing at all."),
    ("Five boxes are the exception. They were present at the first two polls, dropped out at 13:59 ET "
     "and have not returned in the nine polls since — roughly four and three-quarter hours dark. They "
     "are in rooms 1082 (two boxes), 1083, 1002 and 2026, which sit in three different buildings, so "
@@ -492,9 +509,10 @@ attention.</p>
 
 <p><strong>The short version.</strong> The Grandview has a localized failure that is not subtle:
 buildings 1 and 11 degraded for four hours and then lost roughly two-thirds of their boxes in a
-single window, while every other building on the property lost nothing. Per-device telemetry pulled
-during the event points at the <strong>wired path serving those two buildings, not the wireless</strong>
-— their radios are healthy while their connectivity is not. The Berkley shows the same
+single window, while every other building on the property lost nothing. It then recovered on its own
+after about 75 minutes and has been clean since. Per-device telemetry pulled <em>during</em> the event
+points at the <strong>wired path serving those two buildings, not the wireless</strong> — their radios
+were healthy while their connectivity was not. The Berkley shows the same
 network-layer signature but spread evenly across the whole tower rather than concentrated. The Cliffs
 is healthy apart from five boxes dark since early afternoon, and there we can tell you what we
 observed but not why.</p>
