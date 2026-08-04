@@ -64,27 +64,38 @@ end tell
 APPLESCRIPT
 }
 
-# ── 0. is Chrome even up, and is the session alive? ────────────────────────────
-if ! pgrep -xq "Google Chrome"; then echo "Chrome not running — skipping"; exit 0; fi
+# ── 0. can we drive the iCX dashboard this sweep? ──────────────────────────────
+# These checks gate the iCX SWEEP ONLY. They must never skip step 3, because the mDNS registry
+# pull and the rebuild do not touch Chrome at all — they read staging over TLS. Bug found
+# 2026-08-04: every sweep from ~08:00Z died at the "AppleScript JS is disabled" exit, and because
+# that exit came BEFORE step 3 it silently stopped the registry pull and the publish as well. A
+# Chrome preference should not be able to freeze the whole monitor.
+ICX_OK=1
+icx_skip() { echo "$1"; ICX_OK=0; }
 
-H=$(jsq "window.__health?window.__health():'NO_TOOLKIT'")
-case "$H" in
-  *NO_DASHBOARD_TAB*) echo "no dashboard tab — skipping"; exit 0 ;;
-  *"turned off"*)     echo "AppleScript JS is disabled in Chrome — enable View > Developer > Allow JavaScript from Apple Events"; exit 1 ;;
-esac
-if [[ "$H" == *NO_TOOLKIT* ]]; then
-  echo "injecting toolkit"; jsfile "$PIPE/icx-toolkit.js" >/dev/null
+if ! pgrep -xq "Google Chrome"; then
+  icx_skip "Chrome not running — iCX sweep skipped"
+else
   H=$(jsq "window.__health?window.__health():'NO_TOOLKIT'")
-fi
-if [[ "$H" == *'"onLogin":true'* ]]; then
-  echo "AUTH_LAPSED — portal session expired, needs a human login. Page left alone."; exit 0
-fi
-if [[ "$H" != *'"hasSelector":true'* ]]; then
-  echo "dashboard not ready ($H) — skipping"; exit 0
+  case "$H" in
+    *NO_DASHBOARD_TAB*) icx_skip "no dashboard tab — iCX sweep skipped" ;;
+    *"turned off"*)     icx_skip "AppleScript JS is disabled in Chrome — enable View > Developer > Allow JavaScript from Apple Events. iCX sweep skipped; registry pull still running." ;;
+  esac
+  if [ "$ICX_OK" = 1 ] && [[ "$H" == *NO_TOOLKIT* ]]; then
+    echo "injecting toolkit"; jsfile "$PIPE/icx-toolkit.js" >/dev/null
+    H=$(jsq "window.__health?window.__health():'NO_TOOLKIT'")
+  fi
+  if [ "$ICX_OK" = 1 ] && [[ "$H" == *'"onLogin":true'* ]]; then
+    icx_skip "AUTH_LAPSED — portal session expired, needs a human login. iCX sweep skipped."
+  fi
+  if [ "$ICX_OK" = 1 ] && [[ "$H" != *'"hasSelector":true'* ]]; then
+    icx_skip "dashboard not ready ($H) — iCX sweep skipped"
+  fi
 fi
 
 # ── 1. sweep each site ─────────────────────────────────────────────────────────
 NEWDATA=0
+if [ "$ICX_OK" = 1 ]; then
 declare -a SITEROWS=()
 for spec in "${SITES[@]}"; do
   IFS='|' read -r HANDLE NAME LABEL <<< "$spec"
@@ -151,6 +162,8 @@ for spec in "${SITES[@]}"; do
     cp "$HF" "$DROPS/icx-sweeps/$WINDOW/"; mv "$HF" "$DL/$HANDLE/"
   fi
 done
+
+fi   # end ICX_OK sweep
 
 # ── 2. combined site CSV for the window ────────────────────────────────────────
 if [ ${#SITEROWS[@]} -gt 0 ] && [ -n "${WINDOW:-}" ]; then

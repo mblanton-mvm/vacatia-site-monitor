@@ -240,6 +240,17 @@ def main():
             for room in sorted(locks[lock]):
                 want = sorted(exp_pos[room])
                 devs = [d for d in icx_by_lock.get(lock, []) if d['room'] == room]
+                # MVM743 1-bedroom units expect @B/@L, but a tech labelling the single bedroom
+                # @B1 is CORRECT, not an error. merge_rooms.py has always normalised that; this
+                # file did not, so the two halves of the page disagreed — room 2049 read
+                # "All boxes seen / Labeled" in the pills while the Bedroom panel said MISSING
+                # and All ICX Data plainly showed 2049@B1. Same rule, same guard: only fold
+                # B1 -> B when the unit has no B2 to confuse it with.
+                if set(want) == {'B', 'L'}:
+                    for d in devs:
+                        if d['pos'] == 'B1':
+                            d['pos_as_labelled'] = 'B1'
+                            d['pos'] = 'B'
                 positions = {}
                 for w in want:
                     hit = next((d for d in devs if d['pos'] == w), None)
