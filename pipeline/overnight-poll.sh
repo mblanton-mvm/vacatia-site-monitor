@@ -88,7 +88,11 @@ NEWDATA=0
 declare -a SITEROWS=()
 for spec in "${SITES[@]}"; do
   IFS='|' read -r HANDLE NAME LABEL <<< "$spec"
-  rm -f "$DL"/csvData*.csv                       # clear the field before the shot
+  # Do NOT delete pre-existing csvData files — Downloads holds dozens of unrelated old
+  # exports that belong to the user. Instead stamp the clock and refuse anything older,
+  # so a stale leftover can never be filed as this window's data. (A site-name check alone
+  # is not enough: a leftover from the SAME site would sail through it.)
+  CLICKED_AT=$(date +%s)
   jsq "window.__runSite('$HANDLE','$NAME','$LABEL')" >/dev/null
 
   RES=""
@@ -109,9 +113,11 @@ for spec in "${SITES[@]}"; do
   # claim the per-device export; the browser can only write to Downloads root
   CSV=""
   for _ in $(seq 1 15); do
-    CSV=$(ls -t "$DL"/csvData*.csv 2>/dev/null | head -1); [ -n "$CSV" ] && break; sleep 2
+    C=$(ls -t "$DL"/csvData*.csv 2>/dev/null | head -1)
+    if [ -n "$C" ] && [ "$(stat -f %m "$C")" -ge "$CLICKED_AT" ]; then CSV="$C"; break; fi
+    sleep 2
   done
-  if [ -z "$CSV" ]; then echo "  $HANDLE: tick ok ($EXPECT) but NO EXPORT downloaded"; continue; fi
+  if [ -z "$CSV" ]; then echo "  $HANDLE: tick ok ($EXPECT) but NO FRESH EXPORT downloaded"; continue; fi
 
   # the export must be for the site we think it is, and match the tick's own count
   SITENAME=$(awk -F, 'NR==2{print $4}' "$CSV")
