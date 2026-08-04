@@ -262,8 +262,13 @@ def main():
                     per[pos] = 'Name shown, not recorded'
                 elif occ == 'occupied' and norm_init(gl) and initials_of(shown) == norm_init(gl):
                     per[pos] = 'Matches guest'
-                else:
+                elif occ == 'occupied':
                     per[pos] = 'Different name'
+                else:
+                    # A name IS on screen, but with no guest on file there is nothing to compare
+                    # it against. Calling that "Different name" reads as an error we cannot
+                    # actually claim — room 2049 showed a name on both TVs with guestLocked empty.
+                    per[pos] = 'Name shown (no guest on file)'
             b, l = per[bedkey], per['liv']
             named = lambda v: v != 'Welcome'
             if occ == 'vacant' and (named(b) or named(l)):
@@ -325,10 +330,13 @@ def main():
                 pdata[_rid] = {
                     'relabel': norm(d.get('relabel')), 'fw': norm(d.get('fw')),
                     'devmac': norm(d.get('devmac')),
-                    'linear': (lambda o: (None if not isinstance(o, dict)
-                               else 'neither' if o.get('neither')
-                               else '/'.join(n for k, n in (('bed', 'Bedroom'), ('liv', 'Livingroom'))
-                                             if o.get(k)) or 'neither'))(picks.get('ltv')),
+                    # 784 nests this under picks.ltv as a per-TV object; 743's v2 app writes a
+                    # flat yes/no. Take whichever the app actually used.
+                    'linear': ((lambda o: (None if not isinstance(o, dict)
+                                else 'neither' if o.get('neither')
+                                else '/'.join(n for k, n in (('bed', 'Bedroom'), ('liv', 'Livingroom'))
+                                              if o.get(k)) or 'neither'))(picks.get('ltv'))
+                               if picks.get('ltv') is not None else norm(d.get('linear'))),
                     'qr': qr, 'flag': norm(d.get('flag')),
                     'comment': (str(d.get('commentText')).strip()
                                 if str(d.get('commentChoice')) == 'yes'

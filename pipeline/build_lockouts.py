@@ -115,8 +115,10 @@ def guest_check(d):
             per[k] = 'Name shown, not recorded'
         elif occ == 'occupied' and norm(gl) and ini(shown) == norm(gl):
             per[k] = 'Matches guest'
-        else:
+        elif occ == 'occupied':
             per[k] = 'Different name'
+        else:
+            per[k] = 'Name shown (no guest on file)'
     b, l = per[bedkey], per['liv']
     named = lambda v: v != 'Welcome'
     if occ == 'vacant':
