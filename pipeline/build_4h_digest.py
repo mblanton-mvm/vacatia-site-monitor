@@ -1,0 +1,316 @@
+#!/usr/bin/env python3
+"""4-hour Vacatia 3-site digest.
+
+Two outputs from one pass over the banked windows:
+
+  1. A markdown entry appended to the SHARED watch log in mvm-platform
+     (docs/vacatia/vacatia-3site-watch-log.md). That file is the cross-Claude
+     channel: per-user Claude memory does not sync between Michele and Jarran
+     (CLAUDE.md §11), so anything Jarran's Claude must know when it reads and
+     answers in Teams has to live in the repo, not in a memory file.
+  2. A Teams-ready markdown draft (stdout or -o) for format-message.py.
+
+Reads only what the poller already banks — no iCX access, so this is safe to run
+any time and produces the same answer twice.
+
+Sources per window (UTC, from the directory name):
+  docs/vacatia/data-drops/icx-sweeps/<window>/dish-icx-vacatia3-site-<window>.csv
+  docs/vacatia/data-drops/icx-sweeps/<window>/dish-icx-<handle>-health-<window>.csv
+  pipeline/icx/icx-online-stbs-<handle>-<YYYYMMDD>T<HHMM>ET.csv   (per-device, for concentration)
+
+How a window is judged (the §5b rules, encoded so the digest cannot cry wolf):
+  * presence comes from online_stbs in the site CSV, never from a health bucket
+    (buckets lag the widget by a minute or two)
+  * a DIP is a window whose count is below the 4h median for that site
+  * a dip is only ESCALATION-SHAPED if it is part of >=3 consecutive falling
+    windows or availability went bad in the same window; a lone dip that recovers
+    is reported as a dip and nothing more
+  * for a dip at a site with a grouping rule, loss share / fleet share is computed
+    per group and reported only when a group exceeds 3x its fleet share
+"""
+import argparse
+import collections
+import csv
+import glob
+import os
+import re
+import statistics
+import sys
+from datetime import datetime, timedelta, timezone
+
+PIPE = os.path.dirname(os.path.abspath(__file__))
+DROPS = os.path.expanduser('~/Developer/mvm-platform/docs/vacatia/data-drops')
+SWEEPS = f'{DROPS}/icx-sweeps'
+LOG = os.path.expanduser(
+    '~/Developer/mvm-platform/docs/vacatia/vacatia-3site-watch-log.md')
+
+SITES = [
+    ('MVM784', 'The Berkley', 'floor',
+     lambda r: (re.match(r'^(\d{1,2})\d{2}', r).group(1)
+                if re.match(r'^\d{3,4}', r) else '?')),
+    ('MVM783', 'The Grandview', 'building',
+     lambda r: (re.match(r'^(\d{4,5})', r).group(1)[:-3]
+                if re.match(r'^\d{4,5}', r) else '?')),
+    ('MVM743', 'The Cliffs', 'building',
+     lambda r: (re.match(r'^(\d{1,2})', r).group(1)
+                if re.match(r'^\d', r) else '?')),
+]
+
+CONCENTRATION_MIN_RATIO = 3.0   # below this a "concentration" is just fleet shape
+ESCALATION_RUN = 3              # consecutive falling windows before it is a trend
+
+
+def windows_in_range(since, until):
+    out = []
+    for d in sorted(glob.glob(f'{SWEEPS}/*Z')):
+        w = os.path.basename(d)
+        try:
+            t = datetime.strptime(w, '%Y%m%dT%H%M%SZ').replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+        if since <= t <= until:
+            out.append((w, t, d))
+    return out
+
+
+def site_counts(d, w):
+    f = f'{d}/dish-icx-vacatia3-site-{w}.csv'
+    if not os.path.exists(f):
+        return {}
+    out = {}
+    for r in csv.DictReader(open(f, encoding='utf-8-sig')):
+        try:
+            out[r['handle']] = int(r['total_devices'])
+        except (KeyError, ValueError):
+            pass
+    return out
+
+
+def health(d, w, handle):
+    f = f'{d}/dish-icx-{handle.lower()}-health-{w}.csv'
+    if not os.path.exists(f):
+        return None
+    rows = list(csv.DictReader(open(f, encoding='utf-8-sig')))
+    return rows[0] if rows else None
+
+
+def num(row, key):
+    if not row:
+        return None
+    v = (row.get(key) or '').strip()
+    try:
+        return int(v)
+    except ValueError:
+        return None
+
+
+def devices(handle, et_stamp):
+    """Per-device export for one window, keyed device id -> room."""
+    f = f'{PIPE}/icx/icx-online-stbs-{handle}-{et_stamp}.csv'
+    if not os.path.exists(f):
+        return None
+    d = {}
+    for r in csv.DictReader(open(f, encoding='utf-8-sig')):
+        k = (r.get('Device ID') or r.get('﻿Device ID') or '').strip()
+        if k:
+            d[k] = (r.get('Room Number') or '').strip()
+    return d
+
+
+def et_stamp_for(t):
+    """iCX per-device exports are stamped in EASTERN wall clock, one minute
+    before the window end (reference-icx-export-timezone). UTC-4 in DST."""
+    et = t - timedelta(hours=4, minutes=1)
+    return et.strftime('%Y%m%dT%H%M') + 'ET'
+
+
+def concentration(handle, grouping, keyfn, prev_t, cur_t):
+    prev = devices(handle, et_stamp_for(prev_t))
+    cur = devices(handle, et_stamp_for(cur_t))
+    if not prev or not cur:
+        return None
+    lost = set(prev) - set(cur)
+    if not lost:
+        return None
+    fleet = collections.Counter(keyfn(v) for v in prev.values())
+    loss = collections.Counter(keyfn(prev[m]) for m in lost)
+    total, L = sum(fleet.values()), len(lost)
+    rows = []
+    for g, n in loss.most_common():
+        fs = fleet[g] / total
+        rows.append({'group': g, 'lost': n, 'fleet': fleet[g],
+                     'loss_share': n / L, 'fleet_share': fs,
+                     'ratio': (n / L) / fs if fs else 0.0})
+    return {'lost': L, 'grouping': grouping, 'rows': rows,
+            'concentrated': [r for r in rows if r['ratio'] >= CONCENTRATION_MIN_RATIO]}
+
+
+def analyse(since, until):
+    wins = windows_in_range(since, until)
+    per = {h: [] for h, *_ in SITES}
+    for w, t, d in wins:
+        counts = site_counts(d, w)
+        for handle, name, grouping, keyfn in SITES:
+            if handle not in counts:
+                continue
+            hrow = health(d, w, handle)
+            per[handle].append({
+                'w': w, 't': t, 'online': counts[handle],
+                'rssi_bad': num(hrow, 'rssi_bad'),
+                'reboot_warn': num(hrow, 'reboot_warn'),
+                'reboot_bad': num(hrow, 'reboot_bad'),
+                'navail_bad': num(hrow, 'netavail_bad'),
+                'disrupt_bad': num(hrow, 'disrupt_bad'),
+            })
+
+    report = {'since': since, 'until': until, 'windows': len(wins), 'sites': []}
+    for handle, name, grouping, keyfn in SITES:
+        s = per[handle]
+        if not s:
+            report['sites'].append({'handle': handle, 'name': name, 'no_data': True})
+            continue
+        counts = [x['online'] for x in s]
+        med = statistics.median(counts)
+        dips, falling, run = [], [], 0
+        for i, x in enumerate(s):
+            below = x['online'] < med
+            if i and s[i]['online'] < s[i - 1]['online']:
+                run += 1
+            else:
+                run = 0
+            if below:
+                dip = {'w': x['w'], 't': x['t'], 'online': x['online'],
+                       'delta': x['online'] - s[i - 1]['online'] if i else 0,
+                       'navail_bad': x['navail_bad'],
+                       'run': run, 'conc': None}
+                if i:
+                    dip['conc'] = concentration(handle, grouping, keyfn,
+                                                s[i - 1]['t'], x['t'])
+                dips.append(dip)
+            if run >= ESCALATION_RUN:
+                falling.append(x['w'])
+        reb = [(x['w'], x['reboot_warn'], x['reboot_bad']) for x in s
+               if (x['reboot_warn'] or 0) or (x['reboot_bad'] or 0)]
+        report['sites'].append({
+            'handle': handle, 'name': name, 'no_data': False,
+            'first': s[0], 'last': s[-1], 'n': len(s),
+            'min': min(counts), 'max': max(counts), 'median': med,
+            'rssi_bad_range': (min(x['rssi_bad'] for x in s if x['rssi_bad'] is not None),
+                              max(x['rssi_bad'] for x in s if x['rssi_bad'] is not None))
+            if any(x['rssi_bad'] is not None for x in s) else None,
+            'navail_bad_windows': [x['w'] for x in s if (x['navail_bad'] or 0) > 0],
+            'reboots': reb,
+            'dips': dips,
+            'escalation_windows': falling,
+        })
+    return report
+
+
+def hz(t):
+    return t.strftime('%H:%MZ')
+
+
+def verdict(site):
+    if site['no_data']:
+        return 'NO DATA', 'no windows banked in this period'
+    if site['escalation_windows']:
+        return 'ESCALATION-SHAPED', (
+            f"{len(site['escalation_windows'])} window(s) inside a "
+            f"{ESCALATION_RUN}+ consecutive falling run")
+    conc = [d for d in site['dips'] if d['conc'] and d['conc']['concentrated']]
+    if conc:
+        worst = max(conc, key=lambda d: max(r['ratio'] for r in d['conc']['concentrated']))
+        g = max(worst['conc']['concentrated'], key=lambda r: r['ratio'])
+        return 'DIPS, LOCALIZED', (
+            f"{len(conc)} dip(s) concentrated in {worst['conc']['grouping']} "
+            f"{g['group']} at {g['ratio']:.1f}x its fleet share")
+    if site['dips']:
+        return 'DIPS, DIFFUSE', f"{len(site['dips'])} dip(s), no spatial concentration"
+    return 'FLAT', 'no window below the period median'
+
+
+def render(report, teams=False):
+    L = []
+    a, b = hz(report['since']), hz(report['until'])
+    day = report['until'].strftime('%-d %B %Y')
+    head = f'Vacatia 3-site iCX watch — {a} to {b} ({day})'
+    L.append(f'## {head}' if not teams else f'**{head}**')
+    L.append('')
+    L.append(f'{report["windows"]} sweep windows banked in this period.')
+    L.append('')
+
+    for s in report['sites']:
+        v, why = verdict(s)
+        if s['no_data']:
+            L.append(f'- **{s["handle"]} {s["name"]}** — {v}: {why}')
+            continue
+        line = (f'- **{s["handle"]} {s["name"]}** — {v}. '
+                f'Now {s["last"]["online"]}, range {s["min"]}–{s["max"]} '
+                f'over {s["n"]} windows.')
+        L.append(line)
+        det = []
+        if s['rssi_bad_range']:
+            lo, hi = s['rssi_bad_range']
+            det.append(f'RSSI-anomalous {lo}–{hi}')
+        if s['reboots']:
+            tot = sum((w or 0) + (bd or 0) for _, w, bd in s['reboots'])
+            det.append(f'{tot} reboot flag(s) across {len(s["reboots"])} window(s)')
+        else:
+            det.append('zero reboots')
+        if s['navail_bad_windows']:
+            det.append(f'availability bad in {len(s["navail_bad_windows"])} window(s)')
+        if det:
+            L.append(f'  {" · ".join(det)}')
+        if v != 'FLAT':
+            L.append(f'  {why}')
+            for d in s['dips']:
+                bits = [f'{hz(d["t"])} {d["online"]} ({d["delta"]:+d})']
+                if d['conc'] and d['conc']['concentrated']:
+                    for r in d['conc']['concentrated']:
+                        bits.append(f'{r["lost"]}/{d["conc"]["lost"]} in '
+                                    f'{d["conc"]["grouping"]} {r["group"]} '
+                                    f'({r["ratio"]:.1f}x fleet share)')
+                L.append(f'  - {" — ".join(bits)}')
+    L.append('')
+    return '\n'.join(L)
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument('--hours', type=float, default=4.0)
+    p.add_argument('--until', help='UTC ISO instant; default now')
+    p.add_argument('--teams', action='store_true', help='Teams-draft shape')
+    p.add_argument('--append-log', action='store_true',
+                   help=f'append the entry to {LOG}')
+    p.add_argument('-o', '--out')
+    args = p.parse_args()
+
+    until = (datetime.fromisoformat(args.until).replace(tzinfo=timezone.utc)
+             if args.until else datetime.now(timezone.utc))
+    since = until - timedelta(hours=args.hours)
+    rep = analyse(since, until)
+    text = render(rep, teams=args.teams)
+
+    if args.out:
+        open(args.out, 'w').write(text + '\n')
+        print(f'wrote {args.out}', file=sys.stderr)
+    else:
+        print(text)
+
+    if args.append_log:
+        if not os.path.exists(LOG):
+            print(f'log missing, not appending: {LOG}', file=sys.stderr)
+        else:
+            body = open(LOG).read()
+            marker = '<!-- DIGESTS BELOW — newest first -->'
+            entry = render(rep, teams=False)
+            if marker in body:
+                body = body.replace(marker, marker + '\n\n' + entry, 1)
+            else:
+                body = body.rstrip() + '\n\n' + entry
+            open(LOG, 'w').write(body)
+            print(f'appended to {LOG}', file=sys.stderr)
+
+
+if __name__ == '__main__':
+    main()
