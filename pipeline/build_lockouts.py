@@ -97,8 +97,16 @@ def guest_check(d):
                      else (p[0][:1].upper() if p else ''))(
         [x for x in re.split(r'[\s,]+', str(s or '').strip()) if x])
     norm = lambda v: re.sub(r'[^A-Z]', '', str(v or '').upper())
+    # MVM743's punch app writes the v2 flat shape ("_v2": true): the bedroom TV is under
+    # tv["b1"] (its units are Bedroom 1 / Bedroom 2 / Living), and the live-linear answer is a
+    # flat "linear" key. MVM784's app nests answers under "picks" and uses tv["bed"]. Reading only
+    # the 784 shape made every relabelled 743 room report its bedroom as "Welcome" when the tech
+    # had actually recorded a name -- room 2049 showed "Welcome" against a punch entry reading
+    # "Judson York". Accept both shapes; prefer the explicit bedroom key when present.
+    bedkey = 'bed' if isinstance(tv.get('bed'), dict) else ('b1' if isinstance(tv.get('b1'), dict)
+             else ('b' if isinstance(tv.get('b'), dict) else 'bed'))
     per = {}
-    for k in ('bed', 'liv'):
+    for k in (bedkey, 'liv'):
         p = tv.get(k) if isinstance(tv.get(k), dict) else {}
         shown, disp = str(p.get('name') or '').strip(), str(p.get('display') or '')
         if not shown and disp != 'name':
@@ -109,7 +117,7 @@ def guest_check(d):
             per[k] = 'Matches guest'
         else:
             per[k] = 'Different name'
-    b, l = per['bed'], per['liv']
+    b, l = per[bedkey], per['liv']
     named = lambda v: v != 'Welcome'
     if occ == 'vacant':
         v = ('Vacant / inconclusive' if not (named(b) or named(l))
@@ -210,7 +218,8 @@ def main():
                 punch[_rid] = {
                     'done_at': d.get('doneAt') or None,
                     'qr_seen_on': trio(pk.get('qr')),
-                    'live_linear_on': trio(pk.get('ltv')),
+                    'live_linear_on': (trio(pk.get('ltv')) if pk.get('ltv') is not None
+                                    else (d.get('linear') or None)),
                     'use_device_mac': d.get('devmac') or None,
                     'firmware': d.get('fw') or None,
                     'relabel': d.get('relabel') or None,

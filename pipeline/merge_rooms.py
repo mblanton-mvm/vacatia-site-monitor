@@ -242,8 +242,17 @@ def main():
             gl = str(d.get('guestLocked') or '').strip()
             tv = d.get('tv') if isinstance(d.get('tv'), dict) else {}
             occ = ('vacant' if gl.upper() == 'VACANT' else 'occupied' if gl else 'unknown')
+            # MVM743's punch app writes the v2 flat shape ("_v2": true): the bedroom TV is under
+            # tv["b1"] (its units are Bedroom 1 / Bedroom 2 / Living), and the live-linear answer is a
+            # flat "linear" key. MVM784's app nests answers under "picks" and uses tv["bed"]. Reading only
+            # the 784 shape made every relabelled 743 room report its bedroom as "Welcome" when the tech
+            # had actually recorded a name -- room 2049 showed "Welcome" against a punch entry reading
+            # "Judson York". Accept both shapes; prefer the explicit bedroom key when present.
+            bedkey = ('bed' if isinstance(tv.get('bed'), dict)
+                      else 'b1' if isinstance(tv.get('b1'), dict)
+                      else 'b' if isinstance(tv.get('b'), dict) else 'bed')
             per = {}
-            for pos in ('bed', 'liv'):
+            for pos in (bedkey, 'liv'):
                 p = tv.get(pos) if isinstance(tv.get(pos), dict) else {}
                 shown = str(p.get('name') or '').strip()
                 disp = str(p.get('display') or '')
@@ -255,7 +264,7 @@ def main():
                     per[pos] = 'Matches guest'
                 else:
                     per[pos] = 'Different name'
-            b, l = per['bed'], per['liv']
+            b, l = per[bedkey], per['liv']
             named = lambda v: v != 'Welcome'
             if occ == 'vacant' and (named(b) or named(l)):
                 v = 'NAME_SHOWN_WHILE_VACANT'
@@ -280,7 +289,7 @@ def main():
                     # PRIVATE: only emitted into an authenticated build (see build_artifact2
                     # --with-names). Never include these in a public page or the repo.
                     'guest_name': gl if occ == 'occupied' else '',
-                    'bed_name': tvn('bed'), 'liv_name': tvn('liv')}
+                    'bed_name': tvn(bedkey), 'liv_name': tvn('liv')}
 
         # ---- punch-list tech answers ----------------------------------------------
         # DELIBERATELY EXCLUDED: data.tv.{bed,liv}.name, data.bedName/livName and
