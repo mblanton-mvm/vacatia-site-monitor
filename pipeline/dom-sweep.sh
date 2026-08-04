@@ -140,26 +140,31 @@ for spec in "${SITES[@]}"; do
   # e. per-device export. Do NOT clear old csvData files — Downloads holds the user's own
   # unrelated exports. Stamp the clock instead and refuse anything older, so a leftover from
   # the SAME site cannot be filed as this window's data.
-  CLICKED_AT=$(date +%s)
-  jsq "window.__dlStart()" >/dev/null
-  DLR=""
-  for _ in $(seq 1 10); do
-    sleep 2
-    DLR=$(jsq "window.__dlRes||'PENDING'")
-    [[ "$DLR" != *PENDING* ]] && break
-  done
-  if [[ "$DLR" != *DOWNLOAD_CLICKED* ]]; then
-    echo "  $HANDLE: EXPORT CLICK FAILED ($DLR) — count NOT banked without its export"; continue
-  fi
-
+  # Open the menu and click Download in SEPARATE calls with a real sleep between — .menu-icon
+  # toggles, so doing both inside one in-page await can close a menu instead of opening it and
+  # then click some other card's stale entry, reporting success while nothing downloads.
   CSV=""
-  for _ in $(seq 1 20); do
-    C=$(ls -t "$DL"/csvData*.csv 2>/dev/null | head -1)   # find -newermt does not work on this box
-    if [ -n "$C" ] && [ "$(stat -f %m "$C")" -ge "$CLICKED_AT" ]; then CSV="$C"; break; fi
-    sleep 2
+  for attempt in 1 2 3; do
+    CLICKED_AT=$(date +%s)
+    OM=$(jsq "window.__openMenu()")
+    if [[ "$OM" != "MENU_OPENED" ]]; then
+      echo "  $HANDLE: menu did not open ($OM) attempt $attempt"; sleep 3; continue
+    fi
+    sleep 3
+    CD=$(jsq "window.__clickDownload()")
+    if [[ "$CD" != *DOWNLOAD_CLICKED* ]]; then
+      echo "  $HANDLE: no visible Download item ($CD) attempt $attempt"; sleep 3; continue
+    fi
+    for _ in $(seq 1 12); do
+      C=$(ls -t "$DL"/csvData*.csv 2>/dev/null | head -1)  # find -newermt does not work on this box
+      if [ -n "$C" ] && [ "$(stat -f %m "$C")" -ge "$CLICKED_AT" ]; then CSV="$C"; break; fi
+      sleep 2
+    done
+    [ -n "$CSV" ] && break
+    echo "  $HANDLE: clicked Download but no file after 24s — attempt $attempt"
   done
   if [ -z "$CSV" ]; then
-    echo "  $HANDLE: widget read $EXPECT but NO FRESH EXPORT — count NOT banked"; continue
+    echo "  $HANDLE: widget read $EXPECT but NO FRESH EXPORT in 3 attempts — count NOT banked"; continue
   fi
 
   # f. guards: right site, and row count == the widget count
