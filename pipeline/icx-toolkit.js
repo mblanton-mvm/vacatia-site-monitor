@@ -52,8 +52,17 @@
   window.__selHandle = async function (target) {
     const box = document.querySelector('div.p-multiselect');
     if (!box) return { err: 'NO_MULTISELECT' };
-    if (!document.querySelector('.p-multiselect-panel')) { box.click(); await S(700); }
-    const panel = () => document.querySelector('.p-multiselect-panel');
+    // Always use the LAST panel in the DOM. PrimeNG can leave earlier panels behind, and a stale
+    // one is detached from the live component — clicks on it are silently swallowed. Seen
+    // 2026-08-04 with THREE stacked panels: selection appeared to invert and further clicks did
+    // nothing at all. If more than one is present, reset the view rather than guessing.
+    const panels = () => [...document.querySelectorAll('.p-multiselect-panel')];
+    if (panels().length > 1) {
+      location.hash = '#/pages/device/basic'; await S(3500);
+      location.hash = '#/pages/information'; await S(9000);
+    }
+    if (!panels().length) { box.click(); await S(900); }
+    const panel = () => panels()[panels().length - 1];
     if (!panel()) return { err: 'PANEL_DID_NOT_OPEN' };
     const setF = async v => {
       const f = panel().querySelector('input.p-multiselect-filter'); if (!f) return;
