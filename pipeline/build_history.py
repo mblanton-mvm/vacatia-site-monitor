@@ -138,6 +138,13 @@ def main():
             for mac, (label, ip) in cur.items():
                 if mac not in seen:
                     ev[mac].append({'t': cap, 'k': 'reg_first', 'to': label})
+                elif seen[mac] is None:
+                    # It went away and has come back. A returning MAC is real signal — a box that
+                    # re-registered for casting — so record it rather than treating it as a first
+                    # sighting. `seen[mac]` is None here (set by reg_gone), so comparing labels
+                    # below would dereference None: that crashed the build on 2026-08-04 as soon
+                    # as a second registry capture let a tombstoned MAC reappear.
+                    ev[mac].append({'t': cap, 'k': 'reg_back', 'to': label})
                 else:
                     if seen[mac][0] != label:
                         ev[mac].append({'t': cap, 'k': 'reg_label', 'from': seen[mac][0],
