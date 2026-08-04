@@ -93,6 +93,20 @@ jsfile() {
 ICX_OK=1
 icx_skip() { echo "$1"; ICX_OK=0; }
 
+# ── preflight: can this process actually SEE the download dir? ─────────────────
+# macOS TCC protects ~/Downloads. A launchd agent without Full Disk Access can drive Chrome fine
+# and read the rendered page fine, but every directory listing of ~/Downloads comes back EMPTY —
+# so Chrome saves the export and the script concludes "NO FRESH EXPORT". That is what the 23:32Z
+# and 23:47Z unattended runs did: 9-of-9 and 3-of-3 export failures whose files were sitting in
+# ~/Downloads the whole time (csvData (69)/(70)/(71).csv, correctly sized for 460/772/4356 rows).
+# Silently mis-reporting a permissions problem as missing data is the worst outcome, so say it.
+if [ ! -r "$DL" ] || [ -z "$(ls -A "$DL" 2>/dev/null)" ]; then
+  echo "!! CANNOT READ $DL (macOS TCC / Full Disk Access). Chrome will save exports there but this"
+  echo "!! process cannot see them, so nothing can be banked. Grant Full Disk Access to whatever"
+  echo "!! runs this job, or point Chrome's download dir somewhere unprotected."
+  icx_skip "download dir unreadable — iCX sweep skipped (rebuild still running)"
+fi
+
 if ! pgrep -xq "Google Chrome"; then
   icx_skip "Chrome not running — iCX sweep skipped"
 else
