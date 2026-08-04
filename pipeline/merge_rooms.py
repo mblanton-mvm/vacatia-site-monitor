@@ -248,11 +248,12 @@ def main():
             # the 784 shape made every relabelled 743 room report its bedroom as "Welcome" when the tech
             # had actually recorded a name -- room 2049 showed "Welcome" against a punch entry reading
             # "Judson York". Accept both shapes; prefer the explicit bedroom key when present.
-            bedkey = ('bed' if isinstance(tv.get('bed'), dict)
-                      else 'b1' if isinstance(tv.get('b1'), dict)
-                      else 'b' if isinstance(tv.get('b'), dict) else 'bed')
+            # A Cliffs 2-bedroom unit has TWO bedroom TVs (tv["b1"] and tv["b2"]). Michele's call:
+            # report both inside the single "Bedroom shows" cell split by " | ", rather than adding
+            # a Bedroom 2 column that would read n/a for every 1-bedroom unit and both other sites.
+            bedkeys = [k for k in ('bed', 'b', 'b1', 'b2') if isinstance(tv.get(k), dict)] or ['bed']
             per = {}
-            for pos in (bedkey, 'liv'):
+            for pos in bedkeys + ['liv']:
                 p = tv.get(pos) if isinstance(tv.get(pos), dict) else {}
                 shown = str(p.get('name') or '').strip()
                 disp = str(p.get('display') or '')
@@ -269,19 +270,27 @@ def main():
                     # it against. Calling that "Different name" reads as an error we cannot
                     # actually claim — room 2049 showed a name on both TVs with guestLocked empty.
                     per[pos] = 'Name shown (no guest on file)'
-            b, l = per[bedkey], per['liv']
+            bvals = [per[k] for k in bedkeys]
+            l = per['liv']
+            # The verdict reads EVERY TV in the unit, not a bedroom/living pair. There is no way to
+            # collapse two bedrooms into one scalar without losing a defect: "Welcome wins" hides a
+            # name showing while vacant on the other bedroom, and "name wins" hides a bedroom left
+            # on Welcome. Evaluating the whole set keeps both. For a 2-TV unit — every 784 room and
+            # the Cliffs 1-bedrooms — these branches are exactly the old pair logic.
+            vals = bvals + [l]
             named = lambda v: v != 'Welcome'
-            if occ == 'vacant' and (named(b) or named(l)):
+            if occ == 'vacant' and any(named(x) for x in vals):
                 v = 'NAME_SHOWN_WHILE_VACANT'
-            elif occ == 'occupied' and b == 'Welcome' and l == 'Welcome':
+            elif occ == 'occupied' and all(x == 'Welcome' for x in vals):
                 v = 'NO_NAME_ON_EITHER_TV'
-            elif occ == 'occupied' and (b == 'Welcome') != (l == 'Welcome'):
+            elif occ == 'occupied' and any(x == 'Welcome' for x in vals):
+                # some TVs named, at least one still on Welcome
                 v = 'NAME_ON_ONE_TV_ONLY'
-            elif occ == 'occupied' and 'Different name' in (b, l) and 'Matches guest' in (b, l):
+            elif occ == 'occupied' and 'Different name' in vals and 'Matches guest' in vals:
                 v = 'TVS_DISAGREE'
-            elif occ == 'occupied' and b == 'Different name' and l == 'Different name':
+            elif occ == 'occupied' and all(x == 'Different name' for x in vals):
                 v = 'WRONG_NAME_BOTH_TVS'
-            elif occ == 'occupied' and b == 'Matches guest' and l == 'Matches guest':
+            elif occ == 'occupied' and all(x == 'Matches guest' for x in vals):
                 v = 'BOTH_CORRECT'
             elif occ == 'vacant':
                 v = 'VACANT_INCONCLUSIVE'
@@ -290,11 +299,12 @@ def main():
             tvn = lambda k: str(((tv.get(k) or {}) if isinstance(tv, dict) else {}).get('name')
                                  or '').strip()
             return {'occupancy': occ, 'guest_initials': gl if occ == 'occupied' else None,
-                    'bed': b, 'liv': l, 'verdict': v,
+                    # DISPLAY carries every bedroom TV; the verdict above used the collapsed value.
+                    'bed': ' | '.join(bvals), 'liv': l, 'verdict': v,
                     # PRIVATE: only emitted into an authenticated build (see build_artifact2
                     # --with-names). Never include these in a public page or the repo.
                     'guest_name': gl if occ == 'occupied' else '',
-                    'bed_name': tvn(bedkey), 'liv_name': tvn('liv')}
+                    'bed_name': ' | '.join(tvn(k) for k in bedkeys), 'liv_name': tvn('liv')}
 
         # ---- punch-list tech answers ----------------------------------------------
         # DELIBERATELY EXCLUDED: data.tv.{bed,liv}.name, data.bedName/livName and

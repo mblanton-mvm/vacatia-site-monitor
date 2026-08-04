@@ -103,10 +103,12 @@ def guest_check(d):
     # the 784 shape made every relabelled 743 room report its bedroom as "Welcome" when the tech
     # had actually recorded a name -- room 2049 showed "Welcome" against a punch entry reading
     # "Judson York". Accept both shapes; prefer the explicit bedroom key when present.
-    bedkey = 'bed' if isinstance(tv.get('bed'), dict) else ('b1' if isinstance(tv.get('b1'), dict)
-             else ('b' if isinstance(tv.get('b'), dict) else 'bed'))
+    # A Cliffs 2-bedroom unit has TWO bedroom TVs; both are reported in the one bedroom cell,
+    # split by " | ". Kept identical to merge_rooms.name_check so the drill and the lockout
+    # table cannot disagree about the same room.
+    bedkeys = [k for k in ('bed', 'b', 'b1', 'b2') if isinstance(tv.get(k), dict)] or ['bed']
     per = {}
-    for k in (bedkey, 'liv'):
+    for k in bedkeys + ['liv']:
         p = tv.get(k) if isinstance(tv.get(k), dict) else {}
         shown, disp = str(p.get('name') or '').strip(), str(p.get('display') or '')
         if not shown and disp != 'name':
@@ -119,26 +121,29 @@ def guest_check(d):
             per[k] = 'Different name'
         else:
             per[k] = 'Name shown (no guest on file)'
-    b, l = per[bedkey], per['liv']
+    # Reads EVERY TV in the unit. Collapsing two bedrooms to one scalar always loses a defect —
+    # see the note in merge_rooms.name_check. For a 2-TV unit this is the old pair logic exactly.
+    bvals, l = [per[k] for k in bedkeys], per['liv']
+    vals = bvals + [l]
     named = lambda v: v != 'Welcome'
     if occ == 'vacant':
-        v = ('Vacant / inconclusive' if not (named(b) or named(l))
+        v = ('Vacant / inconclusive' if not any(named(x) for x in vals)
              else 'NAME SHOWING WHILE VACANT')
     elif occ == 'occupied':
-        if b == 'Welcome' and l == 'Welcome':
+        if all(x == 'Welcome' for x in vals):
             v = 'NO NAME ON EITHER TV'
-        elif (b == 'Welcome') != (l == 'Welcome'):
+        elif any(x == 'Welcome' for x in vals):
             v = 'NAME ON ONE TV ONLY'
-        elif 'Different name' in (b, l) and 'Matches guest' in (b, l):
+        elif 'Different name' in vals and 'Matches guest' in vals:
             v = 'TVS DISAGREE'
-        elif b == 'Different name' and l == 'Different name':
+        elif all(x == 'Different name' for x in vals):
             v = 'WRONG NAME BOTH TVS'
         else:
             v = 'Both correct'
     else:
         v = 'Occupancy unknown'
     return {'occupancy': occ, 'guest_initials': gl if occ == 'occupied' else None,
-            'bedroom_displayed': b, 'livingroom_displayed': l, 'verdict': v}
+            'bedroom_displayed': ' | '.join(bvals), 'livingroom_displayed': l, 'verdict': v}
 
 
 def main():

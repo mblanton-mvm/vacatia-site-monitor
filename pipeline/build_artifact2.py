@@ -451,15 +451,27 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const mac=h=>h?h.match(/../g).join(':'):'';
 let site=Object.keys(D.sites)[0], f=null, sk=null, sd=1;
 
-// A punchlist answer is only trustworthy if the room was swept AFTER the @-separator was found
-// in the HTVC (2026-07-31, MVM784). Rooms swept 7/29–7/30 were relabelled without the decorator,
-// so their QR / on-screen-name answers describe a labelling that no longer exists — they are
-// excluded from the four punch-answer figures rather than left to inflate them.
-const PUNCH_FROM='2026-07-31';
-const ptDay=iso=>{const t=Date.parse(iso||''); return isNaN(t)?'' :
- new Date(t).toLocaleDateString('en-CA',{timeZone:'America/Los_Angeles'})};
+// A punchlist answer is only trustworthy if the room was swept AFTER the last change that altered
+// what the answer MEANS — and that moment is PER SITE, not global:
+//   MVM784  2026-07-31  the @ separator was found in the HTVC. Rooms swept 7/29-7/30 were
+//                       relabelled without the decorator, so their QR / on-screen-name answers
+//                       describe a labelling that no longer exists.
+//   MVM743  2026-08-04  the punch list was rebuilt to match 784's questions. "Live linear content
+//   MVM783  2026-08-04  works" became "Live TV worked when entering" with per-TV box-reset
+//                       follow-ups, so the earlier answers answer a DIFFERENT question. Commit
+//                       times: 743 fb9e535 14:49:41Z, 783 d12fb41 14:25:44Z.
+// Compared as instants, not calendar days: both apps changed mid-morning, so a date-only cutoff
+// would silently readmit rooms swept earlier the same day against the old questions.
+const PUNCH_WIN={MVM784:['2026-07-31T00:00:00-07:00','the @ separator was found in the HTVC'],
+ MVM783:['2026-08-04T10:25:44-04:00','the punch list questions changed'],
+ MVM743:['2026-08-04T10:49:41-04:00','the punch list questions changed']};
+const PUNCH_DEF=PUNCH_WIN.MVM784;
+const punchWin=code=>PUNCH_WIN[code||site]||PUNCH_DEF;
+const ptStamp=iso=>{const t=Date.parse(iso||''); return isNaN(t)?'':new Date(t)
+ .toLocaleString('en-US',{timeZone:'America/Los_Angeles',dateStyle:'medium',timeStyle:'short'})};
 // no doneAt -> cannot be dated -> cannot be trusted (MVM783 never writes one)
-const inWin=r=>{const d=ptDay((r[R.pk]||[])[P.done]); return !!d&&d>=PUNCH_FROM};
+const inWin=r=>{const t=Date.parse(((r[R.pk]||[])[P.done])||'');
+ return !isNaN(t)&&t>=Date.parse(punchWin()[0])};
 
 // each tile declares the predicate it filters by; rows match the deck Michele laid out
 const TILES=s=>[[
@@ -611,8 +623,9 @@ function drill(s,r){
    .map(([k,v])=>`<div><div class="ch">${k}</div><div class="cv">${v}</div></div>`).join('');
  const stamp=pk[P.done]
    ? esc(new Date(pk[P.done]).toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT')
-     +(inWin(r)?'':` <span class="bad">&mdash; before the @ separator (${PUNCH_FROM}); these four
-        answers are NOT in the figures at the top</span>`)
+     +(inWin(r)?'':` <span class="bad">&mdash; swept before ${esc(punchWin()[1])}
+        (${esc(ptStamp(punchWin()[0]))} PT); these four answers are NOT in the figures at the
+        top</span>`)
    : reswept(r)?'<span class="warn">completed, no timestamp</span>'
    :'<span class="bad">not completed</span>';
  // ---- section 3: the on-screen name check ----
