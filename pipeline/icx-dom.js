@@ -58,7 +58,12 @@
     const panels = () => [...document.querySelectorAll('.p-multiselect-panel')].filter(VIS);
     const hit = i => i.innerText.trim().toLowerCase().includes(t);
 
+    let lastErr = '';
     for (let attempt = 1; attempt <= 3; attempt++) {
+     // The panel can close under us at any moment — another actor clicking the page, a stray
+     // document.body.click() from the export step, a re-render. Then panels() empties and p()
+     // is undefined. Catch per-attempt and retry rather than rejecting the whole promise.
+     try {
       // PrimeNG can leave earlier panels stacked; a reset is cheaper than guessing which is live.
       if (panels().length > 1) {
         location.hash = '#/pages/device/basic'; await S(3500);
@@ -102,12 +107,16 @@
       if (stuck) continue;
 
       // 3. verify: exactly one, and it is ours.
-      if (count() === 1 && (items().find(hit) || {}).classList &&
-          items().find(hit).classList.contains('p-highlight')) {
+      const mine = items().find(hit);
+      if (count() === 1 && mine && mine.classList.contains('p-highlight')) {
         return { ok: true, target, attempt };
       }
+     } catch (e) {
+       lastErr = String(e);
+       await S(2000);
+     }
     }
-    return { err: 'SELECT_UNVERIFIED', label: labelText() };
+    return { err: 'SELECT_UNVERIFIED', label: labelText(), lastErr };
   };
 
   // The export is TWO shell-driven steps with a real bash sleep between them, not one function
@@ -152,8 +161,16 @@
     return l ? l.innerText.trim() : 'NO_LABEL';
   };
 
+  // Setting location.hash to the page we are ALREADY on is a no-op, so the widgets keep showing
+  // the previous site's numbers with nothing to signal the staleness. Bounce via another route
+  // to force the re-render.
   window.__goInfo = function () {
     document.body.click();
+    if (location.hash.indexOf('information') >= 0) {
+      location.hash = '#/pages/device/basic';
+      setTimeout(() => { location.hash = '#/pages/information'; }, 2500);
+      return 'NAV_BOUNCED';
+    }
     location.hash = '#/pages/information';
     return 'NAV';
   };

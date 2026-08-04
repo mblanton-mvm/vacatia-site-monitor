@@ -108,7 +108,7 @@ for spec in "${SITES[@]}"; do
   #    and each can include a ~13s view reset plus a dozen deselect clicks.
   jsq "window.__selStart('$LABEL')" >/dev/null
   SEL=""
-  for _ in $(seq 1 45); do
+  for _ in $(seq 1 70); do
     sleep 2
     SEL=$(jsq "window.__selRes||'PENDING'")
     [[ "$SEL" != *PENDING* ]] && break
@@ -123,12 +123,16 @@ for spec in "${SITES[@]}"; do
     echo "  $HANDLE: SELECTOR GUARD FAILED (label reads '$SL') — discarding this site"; continue
   fi
 
-  # c. information page, then let the widgets settle
+  # c/d. information page, then POLL for the widgets rather than guessing a settle time. MVM783
+  # is 4,300+ boxes and did not finish rendering inside a fixed 20s after a site switch.
   jsq "window.__goInfo()" >/dev/null
-  sleep 20
-
-  # d. rendered counts
-  RD=$(jsq "window.__domRead()")
+  sleep 8
+  RD=""
+  for _ in $(seq 1 20); do
+    RD=$(jsq "window.__domRead()")
+    if [[ "$RD" == *'"stb":'* ]] && [[ "$RD" != *'"stb":null'* ]]; then break; fi
+    sleep 3
+  done
   EXPECT=$(python3 -c "import json,sys;print(json.loads(sys.argv[1])['stb'])" "$RD" 2>/dev/null)
   CONN=$(python3   -c "import json,sys;print(json.loads(sys.argv[1])['conn'])" "$RD" 2>/dev/null)
   NOTCONN=$(python3 -c "import json,sys;print(json.loads(sys.argv[1])['notconn'])" "$RD" 2>/dev/null)
@@ -223,9 +227,29 @@ fi
 if [ "${#SITEROWS[@]:-0}" -gt 0 ] && [ -n "$WINDOW" ]; then
   OUT="$DROPS/icx-sweeps/$WINDOW/dish-icx-vacatia3-site-$WINDOW.csv"
   mkdir -p "$(dirname "$OUT")"
-  { echo 'handle,name,total_devices,pms_connected,s1_total,m1_total,m2_total,m2_pms_connected'
-    printf '%s\n' "${SITEROWS[@]}"; } > "$OUT"
-  echo "wrote $OUT (${#SITEROWS[@]} of 3 sites)"
+  # MERGE, never overwrite: a restricted run (`./dom-sweep.sh MVM783`) would otherwise clobber
+  # the sites another run already banked for this same window, silently turning a 3-site record
+  # into a 1-site one.
+  printf '%s\n' "${SITEROWS[@]}" | /usr/bin/python3 - "$OUT" <<'PY'
+import sys, os
+HDR = 'handle,name,total_devices,pms_connected,s1_total,m1_total,m2_total,m2_pms_connected'
+path = sys.argv[1]
+rows = {}
+if os.path.exists(path):
+    for line in open(path):
+        line = line.strip()
+        if line and not line.startswith('handle,'):
+            rows[line.split(',')[0]] = line
+for line in sys.stdin:
+    line = line.strip()
+    if line:
+        rows[line.split(',')[0]] = line
+order = ['MVM784', 'MVM783', 'MVM743']
+out = [rows[h] for h in order if h in rows] + [v for k, v in rows.items() if k not in order]
+open(path, 'w').write(HDR + '\n' + '\n'.join(out) + '\n')
+print('   site CSV now holds %d of 3 sites: %s' % (len(out), ', '.join(r.split(',')[0] for r in out)))
+PY
+  echo "wrote $OUT"
 fi
 
 # ── 3. rebuild + publish ───────────────────────────────────────────────────────
