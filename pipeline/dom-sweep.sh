@@ -102,18 +102,42 @@ else
     *"turned off"*)     icx_skip "AppleScript JS is disabled in Chrome (View > Developer > Allow JavaScript from Apple Events) — iCX sweep skipped; rebuild still running." ;;
   esac
   if [ "$ICX_OK" = 1 ]; then
-    jsfile "$PIPE/icx-toolkit.js" >/dev/null   # __selHandle + __dlOnline (both pure DOM)
-    D=$(jsfile "$PIPE/icx-dom.js")             # __selStart/__domRead/__dlStart
-    [[ "$D" == *DOM_OK* ]] || icx_skip "icx-dom.js did not inject ($D) — iCX sweep skipped"
-    H=$(jsq "window.__health()")
-  fi
-  if [ "$ICX_OK" = 1 ] && [[ "$H" == *'"onLogin":true'* ]]; then
-    icx_skip "AUTH_LAPSED — portal session expired, needs a human login. iCX sweep skipped."
-  fi
-  if [ "$ICX_OK" = 1 ] && [[ "$H" != *'"hasSelector":true'* ]]; then
-    icx_skip "dashboard not ready ($H) — iCX sweep skipped"
+    H=$(jsq "window.__health?window.__health():'NO_TOOLKIT'")
+    if [[ "$H" == *'"onLogin":true'* ]]; then
+      icx_skip "AUTH_LAPSED — portal session expired, needs a human login. iCX sweep skipped."
+    fi
   fi
 fi
+
+# Reload the tab and re-inject, giving each site a CLEAN DOM.
+#
+# WHY PER SITE: PrimeNG overlays ACCUMULATE. Every __openMenu adds another Online-STBs menu that
+# document.body.click() does not actually tear down, so the count climbs 1 -> 2 -> 3 across the
+# three sites and reached SIX by 23:38Z. Once stacked, the Download click lands on a stale
+# overlay: it reports DOWNLOAD_CLICKED and no file ever arrives — 9 of 9 attempts failed that way
+# at 23:32Z, on all three sites, and clicking the LAST candidate instead of the first did not help
+# either. The page has to be reset. Stale .p-multiselect-panel stacking (the cause of the earlier
+# SELECTOR GUARD / PANEL_DID_NOT_OPEN failures) clears the same way.
+#
+# A reload is cheap and safe: the iCX bearer lives in localStorage (dish-dashboard-access-token /
+# -refresh-token), so the tab returns ALREADY AUTHENTICATED, selection intact, with zero overlays.
+# Measured 2026-08-04 23:39Z — ready in one 4s poll.
+prepare_page() {
+  jsq "location.reload(); 'RELOADING'" >/dev/null
+  for _ in $(seq 1 25); do
+    sleep 4
+    R=$(jsq "JSON.stringify({sel:!!document.querySelector('div.p-multiselect'),pw:!!document.querySelector('input[type=password]')})")
+    if [[ "$R" == *'"pw":true'* ]]; then echo "  AUTH_LAPSED after reload — needs a human login"; return 1; fi
+    if [[ "$R" == *'"sel":true'* ]]; then
+      jsfile "$PIPE/icx-toolkit.js" >/dev/null          # __dlOnline etc (pure DOM)
+      D=$(jsfile "$PIPE/icx-dom.js")                    # __selectOnly / __domRead / __openMenu
+      [[ "$D" == *DOM_OK* ]] || { echo "  icx-dom.js did not inject ($D)"; return 1; }
+      return 0
+    fi
+  done
+  echo "  dashboard did not come back after reload"
+  return 1
+}
 
 # ── 1. per site ────────────────────────────────────────────────────────────────
 NEWDATA=0
@@ -124,6 +148,10 @@ if [ "$ICX_OK" = 1 ]; then
 for spec in "${SITES[@]}"; do
   IFS='|' read -r HANDLE NAME LABEL <<< "$spec"
   echo "── $HANDLE ──"
+
+  if ! prepare_page; then
+    echo "  $HANDLE: page not ready — skipping site"; continue
+  fi
 
   # a. select this site, and only this site. Poll generously: __selectOnly gets up to 3 attempts
   #    and each can include a ~13s view reset plus a dozen deselect clicks.
@@ -171,6 +199,9 @@ for spec in "${SITES[@]}"; do
   CSV=""
   for attempt in 1 2 3; do
     CLICKED_AT=$(date +%s)
+    # Each failed attempt leaves its own overlay behind, so clear before reopening or the count
+    # climbs and __clickDownload (rightly) refuses.
+    [ "$attempt" -gt 1 ] && echo "  menus open before retry: $(jsq "window.__closeMenus()")"
     OM=$(jsq "window.__openMenu()")
     if [[ "$OM" != "MENU_OPENED" ]]; then
       echo "  $HANDLE: menu did not open ($OM) attempt $attempt"; sleep 3; continue

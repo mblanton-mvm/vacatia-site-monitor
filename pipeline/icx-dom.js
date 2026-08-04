@@ -141,14 +141,31 @@
     return 'MENU_OPENED';
   };
 
-  // Stale HIDDEN Download nodes linger in the DOM and click silently, so filter on real
-  // rendered geometry. Clicking the LINK (not the inner text span) is what carries the handler.
+  const dlItems = () => [...document.querySelectorAll('.p-menuitem-link')]
+    .filter(e => /download/i.test(e.innerText || '') && VIS(e));
+
+  window.__menuCount = () => String(dlItems().length);
+
+  // PrimeNG closes overlays on a real Escape keydown; document.body.click() often does not.
+  window.__closeMenus = function () {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true }));
+    document.body.click();
+    return String(dlItems().length);
+  };
+
+  // Stale HIDDEN Download nodes linger and click silently, so filter on rendered geometry, and
+  // click the LINK (not the inner text span) because that is what carries the handler.
+  //
+  // REFUSE when more than one is visible instead of guessing. Stacked overlays mean the page is
+  // polluted, and BOTH the first and the last candidate were proven dead at 23:38Z with six
+  // stacked menus — a click reports success and no file arrives. The caller must reload
+  // (prepare_page) rather than click into a wedged DOM.
   window.__clickDownload = function () {
-    const c = [...document.querySelectorAll('.p-menuitem-link')]
-      .filter(e => /download/i.test(e.innerText || '') && VIS(e));
+    const c = dlItems();
     if (!c.length) return 'NO_VISIBLE_DOWNLOAD_ITEM';
+    if (c.length > 1) return 'TOO_MANY_MENUS n=' + c.length;
     c[0].click();
-    return 'DOWNLOAD_CLICKED n=' + c.length;
+    return 'DOWNLOAD_CLICKED n=1';
   };
 
   window.__selStart = label => window.__park('__selRes', window.__selectOnly(label));
