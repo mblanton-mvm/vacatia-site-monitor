@@ -41,23 +41,24 @@ end tell
 APPLESCRIPT
 }
 
-jsfile() {  # inject a whole file (escaped for AppleScript's string literal)
+jsfile() {  # inject a whole file into the dashboard tab
+  # BASE64, not string-escaping. Passing the toolkit through an AppleScript string literal fails two
+  # different ways, and both were live bugs found 2026-08-04 (the poller had NEVER completed a real
+  # capture; the "AppleScript JS is disabled" exit masked all of this):
+  #   1. Flattening newlines to spaces — icx-toolkit.js is ~200 lines of `//`-commented JS, so the
+  #      first `//` swallows the whole file. Injection evaluates to nothing and the sweep aborts
+  #      with a misleading "dashboard not ready (NO_TOOLKIT)".
+  #        execute javascript "var a=1;//c\nvar b=2; a+b" -> 3        (newlines kept)
+  #        execute javascript "var c=1;//c var d=2; c+d"  -> missing  (flattened)
+  #   2. Keeping newlines via json.dumps — but json.dumps escapes non-ASCII as \uXXXX and
+  #      AppleScript string literals do NOT understand \u. The toolkit's `── ` comment banners are
+  #      U+2500, so osascript dies with "Expected \" but found unknown token. (-2741)".
+  # Base64 is pure ASCII with no quotes, backslashes or newlines, so neither hazard exists. The
+  # TextDecoder/Uint8Array dance (not plain atob) is required because the source is UTF-8.
   local f="$1"
-  local esc; esc=$(python3 - "$f" <<'PY'
-import sys, json
-src = open(sys.argv[1], encoding='utf-8').read()
-# AppleScript string literals DO honour \n, \t, \\ and \" escapes, so json.dumps output can be
-# handed to `execute javascript` as-is (minus its surrounding quotes).
-#
-# Do NOT flatten the newlines. Doing so was a silent, total failure: icx-toolkit.js is ~200 lines
-# of `//`-commented JS, so collapsing it onto one line makes the FIRST `//` comment swallow the
-# entire rest of the file. The injection then evaluates to nothing, __health() is undefined, and the
-# sweep aborts with a misleading "dashboard not ready (NO_TOOLKIT)". Verified 2026-08-04:
-#   execute javascript "var a=1;//c\nvar b=2; a+b"  -> 3        (newlines preserved)
-#   execute javascript "var c=1;//c var d=2; c+d"   -> missing  (flattened)
-# This bug hid behind the "AppleScript JS is disabled" exit all day, so the poller had never once
-# completed a real capture.
-print(json.dumps(src)[1:-1])
+  local b64; b64=$(python3 - "$f" <<'PY'
+import sys, base64
+print(base64.b64encode(open(sys.argv[1], 'rb').read()).decode())
 PY
 )
   osascript <<APPLESCRIPT 2>&1
@@ -65,7 +66,7 @@ tell application "Google Chrome"
   repeat with w in windows
     repeat with t in tabs of w
       if URL of t contains "dashboardfe-dms" then
-        return (execute t javascript "$esc")
+        return (execute t javascript "eval(new TextDecoder().decode(Uint8Array.from(atob('$b64'), function(c){return c.charCodeAt(0)})))")
       end if
     end repeat
   end repeat
