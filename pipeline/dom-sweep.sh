@@ -30,6 +30,19 @@ SITES=(
   "MVM783|The Grandview|The Grandview"
 )
 
+# Optional args restrict the sweep to the named handles (e.g. `./dom-sweep.sh MVM743 MVM784`),
+# for retrying the sites that failed without re-exporting the ones already banked.
+if [ $# -gt 0 ]; then
+  declare -a PICK=()
+  for spec in "${SITES[@]}"; do
+    for want in "$@"; do
+      [[ "$spec" == "$want|"* ]] && PICK+=("$spec")
+    done
+  done
+  SITES=("${PICK[@]}")
+  echo "restricted to: $*"
+fi
+
 jsq() {
   osascript <<APPLESCRIPT 2>&1
 tell application "Google Chrome"
@@ -91,10 +104,11 @@ for spec in "${SITES[@]}"; do
   IFS='|' read -r HANDLE NAME LABEL <<< "$spec"
   echo "── $HANDLE ──"
 
-  # a. select this site, and only this site
+  # a. select this site, and only this site. Poll generously: __selectOnly gets up to 3 attempts
+  #    and each can include a ~13s view reset plus a dozen deselect clicks.
   jsq "window.__selStart('$LABEL')" >/dev/null
   SEL=""
-  for _ in $(seq 1 20); do
+  for _ in $(seq 1 45); do
     sleep 2
     SEL=$(jsq "window.__selRes||'PENDING'")
     [[ "$SEL" != *PENDING* ]] && break
