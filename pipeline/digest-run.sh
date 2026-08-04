@@ -9,9 +9,20 @@
 # The worktree is pinned to the long-lived branch behind PR #819, which is also the answer
 # to `main` being branch-protected: the digest cannot push to main and must not try.
 #
-# Sending to Teams is NOT done here. Posting is an outward action; it happens through the
-# gated path once the Graph send token is authenticated as Michele.
+# Sending to Teams IS done here, on Michele's explicit standing instruction (2026-08-04:
+# "post a summary every 4 hours to mine and jarran's team chat"). Both Graph tokens were
+# verified via /me as Michele Blanton <mblanton@mvmtechnology.com>, so posts appear under
+# her name, not Jarran's.
 set -uo pipefail
+
+# MUST be Apple's python3. The default python3 here is python.org 3.14, which ships with no
+# CA bundle on macOS, so every Graph call dies with CERTIFICATE_VERIFY_FAILED before it even
+# authenticates. 3.9.6 has the system trust store and both scripts compile on it.
+PY=/usr/bin/python3
+PLATFORM="$HOME/Developer/mvm-platform"
+# Michele <-> Jarran 1:1, confirmed LIVE by reading it (there is a dead duplicate 1:1 in
+# Teams whose exact label ranks FIRST in the registry — never trust the label alone).
+CHAT='19:00e7ade9-90d3-47ea-a785-9be19361c912_50bbea07-96de-4bee-a5ca-f349c42292cb@unq.gbl.spaces'
 
 PIPE="$HOME/Developer/vacatia-site-monitor/pipeline"
 WT="$HOME/Developer/mvm-platform-watchlog"
@@ -48,6 +59,23 @@ else
     && echo "  git: committed on $BRANCH"
   git push -q && echo "  git: pushed to $BRANCH (PR #819)" \
     || echo "  git: push FAILED (left committed — check auth/conflict)"
+fi
+
+# ── post to Teams ─────────────────────────────────────────────────────────────
+# Never hand-roll the HTML: Teams strips <p> margins so paragraphs arrive as one blob.
+# format-message.py joins with <br><br>. It also needs FLAT bullets — the doc layout's
+# indented continuation lines get un-wrapped into a run-on paragraph, which is why
+# build_4h_digest.py has a separate --teams renderer.
+HTML="$PIPE/digest-latest.html"
+if "$PY" "$PLATFORM/.claude/skills/teams-chat/format-message.py" "$DRAFT" -o "$HTML" >/dev/null 2>&1; then
+  if grep -q '\*\*' "$HTML"; then
+    echo "  teams: ABORT — literal ** in output, would render as punctuation"
+  else
+    "$PY" "$PLATFORM/scripts/teams-graph/send-chat.py" send "$CHAT" --file "$HTML" \
+      && echo "  teams: posted" || echo "  teams: send FAILED (draft kept at $DRAFT)"
+  fi
+else
+  echo "  teams: formatter failed, nothing sent"
 fi
 
 echo "  done"

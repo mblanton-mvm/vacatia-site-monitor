@@ -275,7 +275,62 @@ def verdict(site):
     return 'FLAT', f"no fall of {site['floor_drop']}+ boxes between windows"
 
 
+def render_teams(report):
+    """One self-contained line per site.
+
+    The doc layout does NOT survive Teams: format-message.py un-wraps indented
+    continuation lines into flowing paragraphs, so a site block plus its dip list
+    arrives as one dense blob (the same unreadable result as trap 1 in the
+    teams-chat skill, by a different route). Chat gets flat bullets, no indentation,
+    each a complete sentence.
+    """
+    L = []
+    a, b = hz(report['since']), hz(report['until'])
+    # "(Claude)" matches the prefix Jarran's Claude already uses in this chat, so a human
+    # skimming the thread can tell agent posts from ours at a glance.
+    L.append(f'(Claude) Vacatia 3-site iCX watch, {a} to {b}. '
+             f'{report["windows"]} sweep windows banked.')
+    L.append('')
+    for s in report['sites']:
+        v, why = verdict(s)
+        if s['no_data']:
+            L.append(f'- **{s["handle"]} {s["name"]}** — {v}: {why}')
+            L.append('')
+            continue
+        bits = [f'**{s["handle"]} {s["name"]}** — {v}.',
+                f'Now {s["last"]["online"]}, range {s["min"]}–{s["max"]} over {s["n"]} windows.']
+        if s['reboots']:
+            tot = sum((w or 0) + (bd or 0) for _, w, bd in s['reboots'])
+            bits.append(f'{tot} reboot flag(s).')
+        else:
+            bits.append('Zero reboots.')
+        if s['dips']:
+            parts = []
+            for d in s['dips']:
+                c = d['conc']
+                where = ''
+                if c and c['concentrated']:
+                    gs = ', '.join(f'{c["grouping"]} {r["group"]}' for r in c['concentrated'])
+                    where = f' ({gs})'
+                parts.append(f'{hz(d["t"])} {d["delta"]:+d}{where}')
+            bits.append('Dips: ' + '; '.join(parts) + '.')
+        L.append('- ' + ' '.join(bits))
+        L.append('')
+    L.append('Verdicts: FLAT is no real fall between windows. DIPS, DIFFUSE means losses '
+             'spread across many floors or buildings, which is usually nothing. DIPS, '
+             'LOCALIZED means one building or floor took losses well above its share of '
+             'the fleet, which is the signal that matters. ESCALATION-SHAPED means three '
+             'or more consecutive falling windows, or availability went bad, so look now.')
+    L.append('')
+    L.append('Standing cautions and open questions are in '
+             'docs/vacatia/vacatia-3site-watch-log.md (PR #819). That file is two-way, so '
+             'your Claude can write into sections A and B as well.')
+    return '\n'.join(L)
+
+
 def render(report, teams=False):
+    if teams:
+        return render_teams(report)
     L = []
     a, b = hz(report['since']), hz(report['until'])
     day = report['until'].strftime('%-d %B %Y')
