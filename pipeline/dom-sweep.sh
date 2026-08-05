@@ -216,7 +216,9 @@ for spec in "${SITES[@]}"; do
   RD=""
   for _ in $(seq 1 20); do
     RD=$(jsq "window.__domRead()")
-    if [[ "$RD" == *'"stb":'* ]] && [[ "$RD" != *'"stb":null'* ]]; then break; fi
+    # Require the PMS card too, not just presence — they render independently, and at the 07:15Z
+    # poll MVM743 read stb=457 with pms_conn=null, leaving that window's PMS columns blank.
+    if [[ "$RD" == *'"stb":'* ]] && [[ "$RD" != *'"stb":null'* ]] && [[ "$RD" != *'"conn":null'* ]]; then break; fi
     sleep 3
   done
   EXPECT=$(python3 -c "import json,sys;print(json.loads(sys.argv[1])['stb'])" "$RD" 2>/dev/null)
