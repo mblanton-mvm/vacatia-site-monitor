@@ -87,14 +87,24 @@
         await S(750);
       };
 
-      // 1. filter down and select the target. A click TOGGLES, so confirm via the count which
-      //    way it went instead of trusting the pre-click class.
+      // 1. filter down and get the target SELECTED, confirmed by its own highlight.
+      //
+      // A click TOGGLES, and it can also be silently SWALLOWED. Only re-clicking when the count
+      // went DOWN missed the swallowed case entirely: the count stayed the same, the deselect
+      // loop then had nothing to do (count was already 1), and the attempt "succeeded" into a
+      // verification failure reading `SELECT_UNVERIFIED / "1 site selected"` — one site
+      // selected, just not the one asked for. Seen on MVM784 at the 07:45Z poll. So loop until
+      // the target itself reports highlighted.
       await setF(target);
-      const tgt = items().find(hit);
+      let tgt = items().find(hit);
       if (!tgt) { await setF(''); continue; }
-      const before = count();
-      tgt.click(); await S(1100);
-      if (count() < before) { tgt.click(); await S(1100); }   // we had toggled it OFF
+      let got = false;
+      for (let k = 0; k < 4; k++) {
+        if (tgt.classList.contains('p-highlight')) { got = true; break; }
+        tgt.click(); await S(1100);
+        tgt = items().find(hit) || tgt;
+      }
+      if (!got) { await setF(''); continue; }
 
       // 2. clear the filter and drop every other selection, until the count says one.
       await setF(''); await S(600);
