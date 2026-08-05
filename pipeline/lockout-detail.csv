@@ -2025,7 +2025,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 ,,,,,2205B,ea:06:45:fd:6c:7f,172.20.215.71,Stale MAC (randomized),,mDNS only,2205B,MVM783,2205,no,
 2206A,68:ab:a9:fc:37:88,68:ab:a9:fc:37:89,2026-08-04 20:12:03,0.0,,,,Not in mDNS,,iCX,2206A,MVM783,2206,no,
 2206A,10:2b:aa:51:fd:45,10:2b:aa:51:fd:46,2026-08-04 20:11:01,0.0,2206A,10:2b:aa:51:fd:46,172.20.222.189,,,iCX,2206A,MVM783,2206,no,
-2206B,68:ab:a9:fb:cd:47,68:ab:a9:fb:cd:48,2026-08-04 20:01:52,0.01,2206B,68:ab:a9:fb:cd:48,172.20.198.178,,,iCX,2206B,MVM783,2206,no,
+2206B,68:ab:a9:fb:cd:47,68:ab:a9:fb:cd:48,2026-08-04 20:01:52,0.01,,,,Not in mDNS,,iCX,2206B,MVM783,2206,no,
 2206B,68:ab:a9:fc:21:2e,68:ab:a9:fc:21:2f,2026-08-04 20:07:55,0.0,2206B,68:ab:a9:fc:21:2f,172.20.207.210,,,iCX,2206B,MVM783,2206,no,
 ,,,,,2206A,3a:5e:cc:ff:95:48,172.20.216.84,Stale MAC (randomized),,mDNS only,2206A,MVM783,2206,no,
 ,,,,,2206B,8a:f4:f4:9b:3f:b8,172.20.199.18,Stale MAC (randomized),,mDNS only,2206B,MVM783,2206,no,
@@ -6938,7 +6938,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 ,,,,,6908B,9e:1d:b4:ab:e0:78,172.20.206.245,Stale MAC (randomized),,mDNS only,6908B,MVM783,6908,no,
 6909A,10:2b:aa:51:59:82,10:2b:aa:51:59:83,2026-08-04 20:02:50,0.01,6909A,10:2b:aa:51:59:83,172.20.218.159,,,iCX,6909A,MVM783,6909,no,
 6909A,64:18:df:74:51:9b,64:18:df:74:51:9c,2026-08-04 20:00:05,0.01,6909A,64:18:df:74:51:9c,172.20.201.129,,,iCX,6909A,MVM783,6909,no,
-6909B,10:2b:aa:51:59:f4,10:2b:aa:51:59:f5,2026-08-04 20:03:38,0.01,6909B,10:2b:aa:51:59:f5,172.20.221.19,,,iCX,6909B,MVM783,6909,no,
+6909B,10:2b:aa:51:59:f4,10:2b:aa:51:59:f5,2026-08-04 20:03:38,0.01,,,,Not in mDNS,,iCX,6909B,MVM783,6909,no,
 6909B,10:2b:aa:51:58:fb,10:2b:aa:51:58:fc,2026-08-04 20:02:30,0.01,,,,Not in mDNS,,iCX,6909B,MVM783,6909,no,
 ,,,,,6909A,62:33:1f:19:db:56,172.20.198.40,Stale MAC (randomized),,mDNS only,6909A,MVM783,6909,no,
 ,,,,,6909B,76:2d:48:5f:95:d9,172.20.204.101,Stale MAC (randomized),,mDNS only,6909B,MVM783,6909,no,
@@ -8445,7 +8445,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 ,,,,,1019,92:ad:a5:89:05:bc,192.168.212.113,Stale MAC (randomized),,mDNS only,1019,MVM743,1019,yes,2026-08-04T22:02:43.157Z
 1020,18:0c:7a:8a:89:98,18:0c:7a:8a:89:99,2026-08-04 20:11:18,0.0,,,,Not in mDNS,,iCX,1020,MVM743,1020,no,
 1020,18:0c:7a:8a:89:8c,18:0c:7a:8a:89:8d,2026-08-04 20:11:21,0.0,,,,Not in mDNS,,iCX,1020,MVM743,1020,no,
-1020,18:0c:7a:8a:89:62,18:0c:7a:8a:89:63,2026-08-04 20:02:33,0.01,1020,18:0c:7a:8a:89:63,192.168.213.69,,,iCX,1020,MVM743,1020,no,
+1020,18:0c:7a:8a:89:62,18:0c:7a:8a:89:63,2026-08-04 20:02:33,0.01,,,,Not in mDNS,,iCX,1020,MVM743,1020,no,
 ,,,,,1020,4a:1b:04:1c:c9:0e,192.168.212.240,Stale MAC (randomized),,mDNS only,1020,MVM743,1020,no,
 ,,,,,1020,96:b5:7e:2c:d5:5c,192.168.213.12,Stale MAC (randomized),,mDNS only,1020,MVM743,1020,no,
 ,,,,,1020,7a:58:4a:87:98:ba,192.168.212.51,Stale MAC (randomized),,mDNS only,1020,MVM743,1020,no,
@@ -9003,7 +9003,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 ,,,,,2079,0a:33:62:7e:32:77,192.168.213.20,Stale MAC (randomized),,mDNS only,2079,MVM743,2079,no,
 ,,,,,2079,02:46:5d:df:f0:3b,192.168.212.124,Stale MAC (randomized),,mDNS only,2079,MVM743,2079,no,
 2080@B1,38:e1:f4:48:8c:6c,38:e1:f4:48:8c:6d,2026-08-04 20:13:00,0.0,2080@B1,38:e1:f4:48:8c:6d,192.168.213.144,,,iCX,2080,MVM743,2080,yes,2026-08-04T16:28:51.348Z
-2080@B2,38:e1:f4:48:87:19,38:e1:f4:48:87:1a,2026-08-04 20:14:40,0.0,,,,Not in mDNS,,iCX,2080,MVM743,2080,yes,2026-08-04T16:28:51.348Z
+2080@B2,38:e1:f4:48:87:19,38:e1:f4:48:87:1a,2026-08-04 20:14:40,0.0,2080@B2,38:e1:f4:48:87:1a,192.168.213.69,,,iCX,2080,MVM743,2080,yes,2026-08-04T16:28:51.348Z
 2080@L,38:e1:f4:48:8e:01,38:e1:f4:48:8e:02,2026-08-04 20:09:30,0.0,,,,Not in mDNS,,iCX,2080,MVM743,2080,yes,2026-08-04T16:28:51.348Z
 ,,,,,2080,f2:18:e6:cb:99:86,192.168.213.10,Stale MAC (randomized),,mDNS only,2080,MVM743,2080,yes,2026-08-04T16:28:51.348Z
 ,,,,,2080,da:bb:83:2a:17:ef,192.168.212.122,Stale MAC (randomized),,mDNS only,2080,MVM743,2080,yes,2026-08-04T16:28:51.348Z
