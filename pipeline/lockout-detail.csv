@@ -7901,7 +7901,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 9706B,68:ab:a9:fe:d4:b7,68:ab:a9:fe:d4:b8,2026-08-05 05:53:29,0.0,9706B,68:ab:a9:fe:d4:b8,172.20.201.119,,,iCX,9706B,MVM783,9706,no,
 9706B,68:ab:a9:fe:da:e8,68:ab:a9:fe:da:e9,2026-08-05 05:45:00,0.01,9706B,68:ab:a9:fe:da:e9,172.20.203.127,,,iCX,9706B,MVM783,9706,no,
 ,,,,,9706B,6a:6e:e4:e8:2d:3c,172.20.194.45,Stale MAC (randomized),,mDNS only,9706B,MVM783,9706,no,
-9707A@BR,68:ab:a9:fd:7f:68,68:ab:a9:fd:7f:69,2026-08-05 05:55:48,0.0,9707A,68:ab:a9:fd:7f:69,172.20.196.183,Position missing in mDNS,,iCX,9707A,MVM783,9707,no,
+9707A@BR,68:ab:a9:fd:7f:68,68:ab:a9:fd:7f:69,2026-08-05 05:55:48,0.0,9707A@BR,68:ab:a9:fd:7f:69,172.20.196.183,,,iCX,9707A,MVM783,9707,no,
 9707A@LR,68:ab:a9:fe:67:2f,68:ab:a9:fe:67:30,2026-08-05 05:55:24,0.0,9707A@LR,68:ab:a9:fe:67:30,172.20.200.20,,,iCX,9707A,MVM783,9707,no,
 9707B@BR,68:ab:a9:fe:7a:8e,68:ab:a9:fe:7a:8f,2026-08-05 05:57:30,0.0,9707B@BR,68:ab:a9:fe:7a:8f,172.20.203.196,,,iCX,9707B,MVM783,9707,no,
 9707B@LR,68:ab:a9:fe:78:2c,68:ab:a9:fe:78:2d,2026-08-05 05:54:46,0.0,9707B@LR,68:ab:a9:fe:78:2d,172.20.204.131,,,iCX,9707B,MVM783,9707,no,
