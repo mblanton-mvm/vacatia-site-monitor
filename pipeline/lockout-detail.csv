@@ -2411,7 +2411,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 ,,,,,3208A,ca:26:fc:93:eb:a0,172.20.217.77,Stale MAC (randomized),,mDNS only,3208A,MVM783,3208,no,
 ,,,,,3208A,ce:47:fa:72:c3:f8,172.20.216.187,Stale MAC (randomized),,mDNS only,3208A,MVM783,3208,no,
 ,,,,,3208B,a6:42:7d:3a:28:86,172.20.213.239,Stale MAC (randomized),,mDNS only,3208B,MVM783,3208,no,
-3209A,68:ab:a9:fb:ff:b4,68:ab:a9:fb:ff:b5,2026-08-05 05:38:42,0.0,,,,Not in mDNS,,iCX,3209A,MVM783,3209,no,
+3209A,68:ab:a9:fb:ff:b4,68:ab:a9:fb:ff:b5,2026-08-05 05:38:42,0.0,3209A,68:ab:a9:fb:ff:b5,172.20.217.169,,,iCX,3209A,MVM783,3209,no,
 3209A,68:ab:a9:fc:7d:83,68:ab:a9:fc:7d:84,2026-08-05 05:38:32,0.0,3209A,68:ab:a9:fc:7d:84,172.20.193.67,,,iCX,3209A,MVM783,3209,no,
 3209B,68:ab:a9:fc:08:25,68:ab:a9:fc:08:26,2026-08-05 05:37:27,0.01,3209B,68:ab:a9:fc:08:26,172.20.218.188,,,iCX,3209B,MVM783,3209,no,
 3209B,68:ab:a9:fc:01:fd,68:ab:a9:fc:01:fe,2026-08-05 05:33:27,0.01,3209B,68:ab:a9:fc:01:fe,172.20.218.250,,,iCX,3209B,MVM783,3209,no,
