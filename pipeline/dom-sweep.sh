@@ -291,6 +291,7 @@ PY
   #     often (column: Average Net Disruption Count, plus Room Number). On net_stats the nine
   #     app-boxes run 0-2 RSSI | 3-5 disruption | 6-8 availability, so warn=4 and bad=5. Zero-count
   #     cards carry no kebab, so they are skipped rather than retried.
+  DG=$(/usr/bin/python3 -c "import json,sys;d=json.loads(sys.argv[1]);print(d.get('disrupt',['','',''])[0])" "$B1" 2>/dev/null || echo '')
   DW=$(/usr/bin/python3 -c "import json,sys;d=json.loads(sys.argv[1]);print(d.get('disrupt',['','',''])[1])" "$B1" 2>/dev/null || echo '')
   DB=$(/usr/bin/python3 -c "import json,sys;d=json.loads(sys.argv[1]);print(d.get('disrupt',['','',''])[2])" "$B1" 2>/dev/null || echo '')
   # Wait for PrimeNG to actually finish tearing the overlay down. __closeMenus() returns before
@@ -314,8 +315,17 @@ PY
     return 1
   }
 
-  for lvl in warn bad; do
-    [ "$lvl" = warn ] && { IDX=4; CNT=$DW; } || { IDX=5; CNT=$DB; }
+  # `good` is exported too (enabled 2026-08-05 on Michele's call) so EVERY box appears in EVERY
+  # poll. Without it a device simply has no row when it is healthy, which is indistinguishable
+  # from not reporting — so "how often does this room have trouble" had no denominator. It is the
+  # bulk of the data (~5,200 rows/poll across the three sites, ~60 MB/day); drop 'good' from this
+  # list to go back to anomalies-only.
+  for lvl in good warn bad; do
+    case "$lvl" in
+      good) IDX=3; CNT=$DG ;;
+      warn) IDX=4; CNT=$DW ;;
+      bad)  IDX=5; CNT=$DB ;;
+    esac
     [ -z "$CNT" ] || [ "$CNT" = "0" ] && continue
     if ! wait_menus_clear; then echo "  disruption-$lvl: menus would not clear — skipping"; continue; fi
     A0=$(date +%s)
