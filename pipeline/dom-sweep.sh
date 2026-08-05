@@ -137,17 +137,40 @@ fi
 # -refresh-token), so the tab returns ALREADY AUTHENTICATED, selection intact, with zero overlays.
 # Measured 2026-08-04 23:39Z — ready in one 4s poll.
 prepare_page() {
-  jsq "location.reload(); 'RELOADING'" >/dev/null
+  # A SENTINEL proves the reload actually committed before anything is injected.
+  #
+  # location.reload() is ASYNCHRONOUS. The old DOM stays live for a moment, so a naive
+  # "wait, then look for div.p-multiselect" finds the OUTGOING page's selector, injects into a
+  # doomed JS context, and the reload then wipes every global. That is the root cause of the
+  # whole family of intermittent failures seen 2026-08-05 06:57-07:09Z — SELECT FAILED PENDING
+  # (the parked promise vanished with its context), SELECT_UNVERIFIED with label "Choose
+  # filters", ONLY_0_BOXES and ONLY_6_BOXES. Proven by probe: window.__selectOnly read
+  # `undefined` right after a sweep that had supposedly just injected it, while a hand-set
+  # marker from BEFORE the reload survived — i.e. no reload had happened when we injected, and
+  # the real one came later.
+  #
+  # So: set the sentinel, reload, wait for the sentinel to DISAPPEAR (fresh context), only then
+  # wait for the selector and inject — and verify the injection took.
+  jsq "window.__preReload=1; location.reload(); 'RELOADING'" >/dev/null
+  local fresh=0
+  for _ in $(seq 1 30); do
+    sleep 2
+    [ "$(jsq "window.__preReload?'STILL':'GONE'")" = "GONE" ] && { fresh=1; break; }
+  done
+  [ "$fresh" = 1 ] || { echo "  reload never committed (sentinel survived) — skipping site"; return 1; }
+
   for _ in $(seq 1 25); do
-    sleep 4
     R=$(jsq "JSON.stringify({sel:!!document.querySelector('div.p-multiselect'),pw:!!document.querySelector('input[type=password]')})")
     if [[ "$R" == *'"pw":true'* ]]; then echo "  AUTH_LAPSED after reload — needs a human login"; return 1; fi
     if [[ "$R" == *'"sel":true'* ]]; then
       jsfile "$PIPE/icx-toolkit.js" >/dev/null          # __dlOnline etc (pure DOM)
       D=$(jsfile "$PIPE/icx-dom.js")                    # __selectOnly / __domRead / __openMenu
       [[ "$D" == *DOM_OK* ]] || { echo "  icx-dom.js did not inject ($D)"; return 1; }
+      # belt and braces: the globals must actually be callable now
+      [ "$(jsq "typeof window.__selectOnly")" = "function" ] || { echo "  injection did not stick"; return 1; }
       return 0
     fi
+    sleep 3
   done
   echo "  dashboard did not come back after reload"
   return 1
