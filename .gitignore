@@ -1,1 +1,4 @@
 node_modules
+
+# transient single-writer lock taken by dom-sweep.sh; never a tracked artifact
+pipeline/.sweep.lock/
