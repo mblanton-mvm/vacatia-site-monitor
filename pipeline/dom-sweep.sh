@@ -341,10 +341,19 @@ PY
       sleep 2
     done
     if [ -z "$AC" ]; then echo "  disruption-$lvl: clicked but no file"; jsq "window.__closeMenus()" >/dev/null; continue; fi
+    # The card number was read from page text seconds before this export was generated, and iCX
+    # reclassifies boxes between severity levels in that gap. Seen at the 05:30Z poll on MVM743:
+    # card said warn=1/bad=38, exports gave warn=0/bad=39 — the TOTAL agreed, one box had simply
+    # moved warn->bad. Discarding on an exact match threw away good data for a benign race.
+    # The export is the authoritative per-device list; the count check exists to prove the right
+    # CARD was clicked, so allow a small drift and record the actual row count.
     AR=$(( $(wc -l < "$AC") - 1 ))
-    if [ "$AR" != "$CNT" ]; then
-      echo "  disruption-$lvl: ROW MISMATCH ($AR vs card $CNT) — discarding"; rm -f "$AC"
+    TOL=$(/usr/bin/python3 -c "print(max(3,int($CNT*0.02)))" 2>/dev/null || echo 3)
+    DIFF=$(/usr/bin/python3 -c "print(abs($AR-$CNT))" 2>/dev/null || echo 999)
+    if [ "$DIFF" -gt "$TOL" ]; then
+      echo "  disruption-$lvl: ROW MISMATCH ($AR vs card $CNT, tolerance $TOL) — wrong card? discarding"; rm -f "$AC"
     else
+      [ "$AR" != "$CNT" ] && echo "  disruption-$lvl: card said $CNT, export has $AR (reclassified mid-poll; keeping the export)"
       mkdir -p "$DROPS/icx-anomalies"
       cp "$AC" "$DROPS/icx-anomalies/disruption-$lvl-$HANDLE-$TS.csv"
       mv "$AC" "$DL/$HANDLE/disruption-$lvl-$HANDLE-$TS.csv"
