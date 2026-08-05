@@ -275,14 +275,83 @@ PY
     NEWDATA=1
   fi
 
-  # h. site-level health row. The four good/warn/bad triples (RSSI, disruption, reboots, net
-  #    availability) are NOT captured on this path yet — they render only on #/pages/net_stats
-  #    and #/pages/system_performance_1. Left EMPTY, never zero: blank means not measured.
+  # h. health buckets, read as TEXT off the two other pages. Six metrics, good/warn/bad each.
+  #    Any metric that cannot be read stays EMPTY in the CSV — blank means not measured, and must
+  #    never be read as a zero.
+  BK='{}'
+  jsq "window.__goPage('net_stats')" >/dev/null
+  sleep 8
+  for _ in $(seq 1 15); do
+    B1=$(jsq "window.__readBuckets()")
+    [[ "$B1" == *'"disrupt"'* ]] && break
+    sleep 3
+  done
+
+  # h2. per-device INTERNET DISRUPTION lists — this is the only way to learn WHICH boxes and how
+  #     often (column: Average Net Disruption Count, plus Room Number). On net_stats the nine
+  #     app-boxes run 0-2 RSSI | 3-5 disruption | 6-8 availability, so warn=4 and bad=5. Zero-count
+  #     cards carry no kebab, so they are skipped rather than retried.
+  DW=$(/usr/bin/python3 -c "import json,sys;d=json.loads(sys.argv[1]);print(d.get('disrupt',['','',''])[1])" "$B1" 2>/dev/null || echo '')
+  DB=$(/usr/bin/python3 -c "import json,sys;d=json.loads(sys.argv[1]);print(d.get('disrupt',['','',''])[2])" "$B1" 2>/dev/null || echo '')
+  for lvl in warn bad; do
+    [ "$lvl" = warn ] && { IDX=4; CNT=$DW; } || { IDX=5; CNT=$DB; }
+    [ -z "$CNT" ] || [ "$CNT" = "0" ] && continue
+    A0=$(date +%s)
+    OM=$(jsq "window.__openMenuIdx($IDX,$CNT)")
+    if [[ "$OM" != "MENU_OPENED" ]]; then echo "  disruption-$lvl: $OM"; jsq "window.__closeMenus()" >/dev/null; continue; fi
+    sleep 3
+    CD=$(jsq "window.__clickDownload()")
+    if [[ "$CD" != *DOWNLOAD_CLICKED* ]]; then echo "  disruption-$lvl: $CD"; jsq "window.__closeMenus()" >/dev/null; continue; fi
+    AC=""
+    for _ in $(seq 1 10); do
+      C=$(ls -t "$DL"/csvData*.csv 2>/dev/null | head -1)
+      if [ -n "$C" ] && [ "$(stat -f %m "$C")" -ge "$A0" ]; then AC="$C"; break; fi
+      sleep 2
+    done
+    if [ -z "$AC" ]; then echo "  disruption-$lvl: clicked but no file"; jsq "window.__closeMenus()" >/dev/null; continue; fi
+    AR=$(( $(wc -l < "$AC") - 1 ))
+    if [ "$AR" != "$CNT" ]; then
+      echo "  disruption-$lvl: ROW MISMATCH ($AR vs card $CNT) — discarding"; rm -f "$AC"
+    else
+      mkdir -p "$DROPS/icx-anomalies"
+      cp "$AC" "$DROPS/icx-anomalies/disruption-$lvl-$HANDLE-$TS.csv"
+      mv "$AC" "$DL/$HANDLE/disruption-$lvl-$HANDLE-$TS.csv"
+      echo "  disruption-$lvl: $AR boxes -> icx-anomalies/disruption-$lvl-$HANDLE-$TS.csv"
+    fi
+    jsq "window.__closeMenus()" >/dev/null
+  done
+
+  jsq "window.__goPage('system_performance_1')" >/dev/null
+  sleep 8
+  for _ in $(seq 1 15); do
+    B2=$(jsq "window.__readBuckets()")
+    [[ "$B2" == *'"reboot"'* ]] && break
+    sleep 3
+  done
+  BK=$(/usr/bin/python3 -c "import json,sys;a=json.loads(sys.argv[1] or '{}');a.update(json.loads(sys.argv[2] or '{}'));print(json.dumps(a))" "${B1:-{\}}" "${B2:-{\}}" 2>/dev/null || echo '{}')
+  echo "  buckets: $BK"
+
+  # h3. site-level health row
   if [ -n "$W" ]; then
     mkdir -p "$DROPS/icx-sweeps/$W"
-    { echo 'mvm_handle,taken_at,online_stbs,pms_connected,pms_not_connected,rssi_good,rssi_warn,rssi_bad,disrupt_good,disrupt_warn,disrupt_bad,reboot_good,reboot_warn,reboot_bad,netavail_good,netavail_warn,netavail_bad'
-      echo "$HANDLE,${W:0:4}-${W:4:2}-${W:6:2}T${W:9:2}:${W:11:2}:${W:13:2}Z,$EXPECT,$CONN,$NOTCONN,,,,,,,,,,,,"
-    } > "$DROPS/icx-sweeps/$W/dish-icx-$(echo "$HANDLE" | tr 'A-Z' 'a-z')-health-$W.csv"
+    /usr/bin/python3 - "$DROPS/icx-sweeps/$W/dish-icx-$(echo "$HANDLE" | tr 'A-Z' 'a-z')-health-$W.csv" \
+      "$HANDLE" "$W" "$EXPECT" "$CONN" "$NOTCONN" "$BK" <<'PY'
+import json, sys
+path, handle, w, online, conn, notconn, bk = sys.argv[1:8]
+b = json.loads(bk or '{}')
+taken = f"{w[0:4]}-{w[4:6]}-{w[6:8]}T{w[9:11]}:{w[11:13]}:{w[13:15]}Z"
+# The original four metrics keep their original column positions so the existing archive stays
+# readable; CPU utilisation and CPU temperature are appended.
+order = ['rssi', 'disrupt', 'reboot', 'netavail', 'cpu', 'cputemp']
+hdr = ['mvm_handle', 'taken_at', 'online_stbs', 'pms_connected', 'pms_not_connected']
+for m in order:
+    hdr += [f'{m}_good', f'{m}_warn', f'{m}_bad']
+row = [handle, taken, online, conn, notconn]
+for m in order:
+    v = b.get(m)
+    row += [str(x) for x in v] if v else ['', '', '']   # blank = not measured, never zero
+open(path, 'w').write(','.join(hdr) + '\n' + ','.join(row) + '\n')
+PY
   fi
   SITEROWS+=("$HANDLE,$NAME,$EXPECT,$CONN,0,0,$EXPECT,$CONN")
 done

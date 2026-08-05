@@ -168,6 +168,64 @@
     return 'DOWNLOAD_CLICKED n=1';
   };
 
+  // ── health buckets ──────────────────────────────────────────────────────────
+  // The four good/warn/bad triples live on two other pages and are read as TEXT, same as the
+  // presence widget. Verified rendering 2026-08-05 03:22Z:
+  //   #/pages/net_stats           -> "RSSI STB Count (Last 15 min) 4219 133 1"
+  //                                  "INTERNET DISRUPTION STB Count (Last 15 min) 4329 11 13"
+  //                                  "INTERNET AVAILABILITY STB Count (Last 15 min) 4336 1 2"
+  //   #/pages/system_performance_1 -> "CPU UTILISATION ... 4187 143 0"
+  //                                  "CPU TEMPERATURE ... 0 4353 0"
+  //                                  "REBOOT COUNT STB Count (Last 15 min) 4352 1 0"
+  // Thresholds (from the old API payload): reboot warn = 1-2 in the window, bad = 3+.
+  const METRICS = {
+    rssi: 'RSSI',
+    disrupt: 'INTERNET DISRUPTION',
+    netavail: 'INTERNET AVAILABILITY',
+    cpu: 'CPU UTILISATION',
+    cputemp: 'CPU TEMPERATURE',
+    reboot: 'REBOOT COUNT'
+  };
+
+  window.__goPage = function (page) {
+    document.body.click();
+    location.hash = '#/pages/' + page;
+    return 'NAV ' + page;
+  };
+
+  window.__readBuckets = function () {
+    const txt = document.body.innerText.replace(/\s+/g, ' ');
+    const out = {};
+    for (const [key, label] of Object.entries(METRICS)) {
+      const re = new RegExp(label + '\\s*STB Count \\(Last 15 min\\)\\s*([\\d,]+)\\s+([\\d,]+)\\s+([\\d,]+)');
+      const m = txt.match(re);
+      if (m) out[key] = m.slice(1, 4).map(v => Number(v.replace(/,/g, '')));
+    }
+    return JSON.stringify(out);
+  };
+
+  // ── per-device anomaly export ───────────────────────────────────────────────
+  // Each card on these pages has its own export kebab, which is how the WHICH-BOXES data is
+  // obtained (columns: Device ID, Average Net Disruption Count, Timestamp, Site, Room Number).
+  // The nine app-box elements are in document order, three per metric:
+  //   net_stats            0-2 RSSI | 3-5 INTERNET DISRUPTION | 6-8 INTERNET AVAILABILITY
+  //   system_performance_1 0-2 CPU  | 3-5 CPU TEMPERATURE      | 6-8 REBOOT COUNT
+  // Index alone would silently export the wrong metric if the layout ever changed, so the
+  // caller passes the number it EXPECTS to find in that box and we refuse on a mismatch.
+  window.__openMenuIdx = function (idx, expect) {
+    document.body.click();
+    const boxes = [...document.querySelectorAll('app-box')];
+    if (boxes.length < 9) return 'ONLY_' + boxes.length + '_BOXES';
+    const box = boxes[idx];
+    if (!box) return 'NO_BOX_AT_' + idx;
+    const shown = (box.innerText || '').replace(/[\s,]/g, '');
+    if (String(expect) !== shown) return 'BOX_MISMATCH idx=' + idx + ' expected=' + expect + ' shows=' + shown;
+    const icon = box.querySelector('.menu-icon');
+    if (!icon) return 'NO_KEBAB idx=' + idx;   // zero-count cards have no export
+    icon.click();
+    return 'MENU_OPENED';
+  };
+
   window.__selStart = label => window.__park('__selRes', window.__selectOnly(label));
 
   // The guard that caught a real two-sites-selected contamination on 2026-08-04 (Cliffs left
