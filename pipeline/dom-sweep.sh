@@ -293,9 +293,23 @@ PY
   #     cards carry no kebab, so they are skipped rather than retried.
   DW=$(/usr/bin/python3 -c "import json,sys;d=json.loads(sys.argv[1]);print(d.get('disrupt',['','',''])[1])" "$B1" 2>/dev/null || echo '')
   DB=$(/usr/bin/python3 -c "import json,sys;d=json.loads(sys.argv[1]);print(d.get('disrupt',['','',''])[2])" "$B1" 2>/dev/null || echo '')
+  # Wait for PrimeNG to actually finish tearing the overlay down. __closeMenus() returns before
+  # the close animation completes, so opening the next menu immediately leaves TWO in the DOM and
+  # __clickDownload (rightly) refuses with TOO_MANY_MENUS — exactly what happened to the
+  # disruption-bad export at 03:33Z while disruption-warn had just succeeded.
+  wait_menus_clear() {
+    for _ in $(seq 1 10); do
+      [ "$(jsq "window.__menuCount()")" = "0" ] && return 0
+      jsq "window.__closeMenus()" >/dev/null
+      sleep 2
+    done
+    return 1
+  }
+
   for lvl in warn bad; do
     [ "$lvl" = warn ] && { IDX=4; CNT=$DW; } || { IDX=5; CNT=$DB; }
     [ -z "$CNT" ] || [ "$CNT" = "0" ] && continue
+    if ! wait_menus_clear; then echo "  disruption-$lvl: menus would not clear — skipping"; continue; fi
     A0=$(date +%s)
     OM=$(jsq "window.__openMenuIdx($IDX,$CNT)")
     if [[ "$OM" != "MENU_OPENED" ]]; then echo "  disruption-$lvl: $OM"; jsq "window.__closeMenus()" >/dev/null; continue; fi
