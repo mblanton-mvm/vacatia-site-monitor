@@ -298,11 +298,19 @@ PY
   # __clickDownload (rightly) refuses with TOO_MANY_MENUS — exactly what happened to the
   # disruption-bad export at 03:33Z while disruption-warn had just succeeded.
   wait_menus_clear() {
-    for _ in $(seq 1 10); do
+    for _ in 1 2 3; do
       [ "$(jsq "window.__menuCount()")" = "0" ] && return 0
       jsq "window.__closeMenus()" >/dev/null
       sleep 2
     done
+    # After a Download has actually been CLICKED, the overlay stops responding to Escape and to
+    # body-click — but re-rendering the page drops it. Measured 2026-08-05 03:36Z: the second
+    # per-device export was skipped on both MVM784 and MVM783 until this bounce was added.
+    # __openMenuIdx re-verifies the card's own number afterwards, so a bounce can never cause the
+    # wrong metric to be exported.
+    jsq "window.__goPage('system_performance_1')" >/dev/null; sleep 6
+    jsq "window.__goPage('net_stats')" >/dev/null; sleep 12
+    [ "$(jsq "window.__menuCount()")" = "0" ] && return 0
     return 1
   }
 
