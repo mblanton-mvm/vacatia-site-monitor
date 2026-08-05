@@ -281,9 +281,14 @@ PY
   BK='{}'
   jsq "window.__goPage('net_stats')" >/dev/null
   sleep 8
-  for _ in $(seq 1 15); do
+  # Wait for ALL THREE net_stats sections, not just one. A partially-rendered page cost MVM783
+  # its whole per-device capture at the 06:30Z poll: only 6 of the 9 app-boxes existed, so
+  # netavail read blank and every export refused with ONLY_6_BOXES. (The refusal was correct —
+  # on a 6-box page, index 3 is a different metric entirely.)
+  for _ in $(seq 1 20); do
     B1=$(jsq "window.__readBuckets()")
-    [[ "$B1" == *'"disrupt"'* ]] && break
+    if [[ "$B1" == *'"rssi"'* && "$B1" == *'"disrupt"'* && "$B1" == *'"netavail"'* ]] \
+       && [ "$(jsq "document.querySelectorAll('app-box').length")" = "9" ]; then break; fi
     sleep 3
   done
 
@@ -364,9 +369,10 @@ PY
 
   jsq "window.__goPage('system_performance_1')" >/dev/null
   sleep 8
-  for _ in $(seq 1 15); do
+  for _ in $(seq 1 20); do
     B2=$(jsq "window.__readBuckets()")
-    [[ "$B2" == *'"reboot"'* ]] && break
+    if [[ "$B2" == *'"cpu"'* && "$B2" == *'"cputemp"'* && "$B2" == *'"reboot"'* ]] \
+       && [ "$(jsq "document.querySelectorAll('app-box').length")" = "9" ]; then break; fi
     sleep 3
   done
   BK=$(/usr/bin/python3 -c "import json,sys;a=json.loads(sys.argv[1] or '{}');a.update(json.loads(sys.argv[2] or '{}'));print(json.dumps(a))" "${B1:-{\}}" "${B2:-{\}}" 2>/dev/null || echo '{}')
