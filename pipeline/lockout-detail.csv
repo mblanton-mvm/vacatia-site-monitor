@@ -6722,7 +6722,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 ,,,,,8104B,e6:ef:d8:8e:c7:0d,172.20.192.241,Stale MAC (randomized),,mDNS only,8104B,MVM783,8104,no,
 ,,,,,8104B,3e:bc:91:8a:19:cb,172.20.213.81,Stale MAC (randomized),,mDNS only,8104B,MVM783,8104,no,
 8105A,68:ab:a9:fc:32:8e,68:ab:a9:fc:32:8f,2026-08-05 06:44:39,0.0,8105A,68:ab:a9:fc:32:8f,172.20.203.149,,,iCX,8105A,MVM783,8105,no,
-8105A,68:ab:a9:fb:83:ca,68:ab:a9:fb:83:cb,2026-08-05 06:36:53,0.01,8105A,68:ab:a9:fb:83:cb,172.20.219.148,,,iCX,8105A,MVM783,8105,no,
+8105A,68:ab:a9:fb:83:ca,68:ab:a9:fb:83:cb,2026-08-05 06:36:53,0.01,,,,Not in mDNS,,iCX,8105A,MVM783,8105,no,
 8105B,10:2b:aa:51:f3:fd,10:2b:aa:51:f3:fe,2026-08-05 06:41:46,0.0,8105B,10:2b:aa:51:f3:fe,172.20.222.88,,,iCX,8105B,MVM783,8105,no,
 8105B,10:2b:aa:51:f3:d6,10:2b:aa:51:f3:d7,2026-08-05 06:37:48,0.0,8105B,10:2b:aa:51:f3:d7,172.20.222.254,,,iCX,8105B,MVM783,8105,no,
 ,,,,,8105A,d6:dd:df:3d:94:6c,172.20.195.105,Stale MAC (randomized),,mDNS only,8105A,MVM783,8105,no,
