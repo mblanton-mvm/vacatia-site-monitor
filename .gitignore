@@ -2,3 +2,8 @@ node_modules
 
 # transient single-writer lock taken by dom-sweep.sh; never a tracked artifact
 pipeline/.sweep.lock/
+
+# Raw iCX per-device exports: bulk data the published site never serves (index.html is
+# self-contained). 136 MB / 658 files here was bloating every Pages deploy. The durable
+# archive lives in mvm-platform docs/vacatia/data-drops/icx-online-stbs/.
+pipeline/icx/

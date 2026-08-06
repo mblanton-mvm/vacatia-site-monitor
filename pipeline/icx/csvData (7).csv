@@ -1,7 +1,0 @@
-Application Name,Package Name,Cumulative Usage(Hrs),STB Count
-OnStream,tv.accedo.xdk.dishtv,15434.93,33
-YouTube,com.google.android.youtube.tv,0.83,2
-Android TV Home,com.google.android.tvlauncher,0.17,5
-Google,com.google.android.katniss,0.08,1
-Settings,com.android.tv.settings,0.04,1
-Permission controller,com.google.android.permissioncontroller,0.00,1
