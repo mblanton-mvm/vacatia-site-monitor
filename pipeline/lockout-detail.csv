@@ -2988,7 +2988,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 ,,,,,4106A,3e:fb:05:79:e6:f7,172.20.217.22,Stale MAC (randomized),,mDNS only,4106A,MVM783,4106,no,
 ,,,,,4106A,12:ad:5d:b2:4d:c1,172.20.216.57,Stale MAC (randomized),,mDNS only,4106A,MVM783,4106,no,
 ,,,,,4106B,da:c5:4f:ba:c5:a9,172.20.210.152,Stale MAC (randomized),,mDNS only,4106B,MVM783,4106,no,
-4107A,64:18:df:74:3a:c0,64:18:df:74:3a:c1,2026-08-06 00:47:14,0.01,4107A,64:18:df:74:3a:c1,172.20.210.162,,,iCX,4107A,MVM783,4107,no,
+4107A,64:18:df:74:3a:c0,64:18:df:74:3a:c1,2026-08-06 00:47:14,0.01,,,,Not in mDNS,,iCX,4107A,MVM783,4107,no,
 4107A,10:2b:aa:52:68:f7,10:2b:aa:52:68:f8,2026-08-06 00:45:50,0.01,4107A,10:2b:aa:52:68:f8,172.20.210.158,,,iCX,4107A,MVM783,4107,no,
 4107B,68:ab:a9:fe:db:b5,68:ab:a9:fe:db:b6,2026-08-06 00:56:52,0.0,4107B,68:ab:a9:fe:db:b6,172.20.210.160,,,iCX,4107B,MVM783,4107,no,
 4107B,68:ab:a9:fe:d5:be,68:ab:a9:fe:d5:bf,2026-08-06 00:52:27,0.01,4107B,68:ab:a9:fe:d5:bf,172.20.210.161,,,iCX,4107B,MVM783,4107,no,
