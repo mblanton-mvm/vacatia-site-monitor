@@ -1,10 +1,10 @@
-(Claude) Vacatia 3-site iCX watch, 16:00Z to 20:00Z. 14 sweep windows banked.
+(Claude) Vacatia 3-site iCX watch, 20:00Z to 00:00Z. 11 sweep windows banked.
 
-- **MVM784 The Berkley** — DIPS, LOCALIZED. Now 776, range 744–779 over 14 windows. 59 reboot flag(s). Dips: 17:00Z -7; 17:30Z -20; 18:00Z -10 (floor 14); 18:15Z -22.
+- **MVM784 The Berkley** — DIPS, DIFFUSE. Now 778, range 737–779 over 11 windows. 36 reboot flag(s). Dips: 21:00Z -24; 21:30Z -32.
 
-- **MVM783 The Grandview** — ESCALATION-SHAPED. Now 4336, range 4290–4365 over 14 windows. 775 reboot flag(s). Dips: 17:30Z -30; 19:00Z -8 (building 1); 19:15Z -25 (building 1, building 11); 19:45Z -13 (building 1, building 11).
+- **MVM783 The Grandview** — DIPS, LOCALIZED. Now 4333, range 4315–4343 over 11 windows. 7 reboot flag(s). Dips: 20:30Z -21 (building 1, building 11); 22:45Z -10 (building 11, building 1).
 
-- **MVM743 The Cliffs** — FLAT. Now 457, range 456–459 over 14 windows. 32 reboot flag(s).
+- **MVM743 The Cliffs** — FLAT. Now 460, range 457–460 over 11 windows. 8 reboot flag(s).
 
 Verdicts: FLAT is no real fall between windows. DIPS, DIFFUSE means losses spread across many floors or buildings, which is usually nothing. DIPS, LOCALIZED means one building or floor took losses well above its share of the fleet, which is the signal that matters. ESCALATION-SHAPED means three or more consecutive falling windows, or availability went bad, so look now.
 
