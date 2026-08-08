@@ -878,7 +878,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 11007A,68:ab:a9:fe:ec:5a,68:ab:a9:fe:ec:5b,2026-08-07 09:00:36,0.01,11007A,68:ab:a9:fe:ec:5b,172.20.210.246,,,iCX,11007A,MVM783,11007A,no,
 ,,,,,11007A,fe:db:af:3f:11:54,172.20.208.246,Stale MAC (randomized),,mDNS only,11007A,MVM783,11007A,no,
 ,,,,,11007A,2a:d9:5b:66:7f:15,172.20.215.130,Stale MAC (randomized),,mDNS only,11007A,MVM783,11007A,no,
-11007B,68:ab:a9:fc:90:e7,68:ab:a9:fc:90:e8,2026-08-07 09:07:46,0.01,11007B,68:ab:a9:fc:90:e8,172.20.218.9,,,iCX,11007B,MVM783,11007B,no,
+11007B,68:ab:a9:fc:90:e7,68:ab:a9:fc:90:e8,2026-08-07 09:07:46,0.01,,,,Not in mDNS,,iCX,11007B,MVM783,11007B,no,
 11007B,68:ab:a9:f8:d1:89,68:ab:a9:f8:d1:8a,2026-08-07 09:03:04,0.01,11007B,68:ab:a9:f8:d1:8a,172.20.218.40,,,iCX,11007B,MVM783,11007B,no,
 ,,,,,11007B,ae:22:6e:65:9f:59,172.20.218.11,Stale MAC (randomized),,mDNS only,11007B,MVM783,11007B,no,
 11008A,68:ab:a9:f9:5b:f2,68:ab:a9:f9:5b:f3,2026-08-07 09:11:13,0.0,11008A,68:ab:a9:f9:5b:f3,172.20.223.160,,,iCX,11008A,MVM783,11008A,no,
