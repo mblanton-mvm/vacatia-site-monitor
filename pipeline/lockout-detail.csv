@@ -1756,7 +1756,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 2304A,10:2b:aa:51:f8:59,10:2b:aa:51:f8:5a,2026-08-07 09:12:23,0.0,2304A,10:2b:aa:51:f8:5a,172.20.196.214,,,iCX,2304A,MVM783,2304,no,
 2304A,10:2b:aa:51:f7:6c,10:2b:aa:51:f7:6d,2026-08-07 09:01:37,0.01,2304A,10:2b:aa:51:f7:6d,172.20.194.158,,,iCX,2304A,MVM783,2304,no,
 2304B,10:2b:aa:51:f8:aa,10:2b:aa:51:f8:ab,2026-08-07 09:11:57,0.0,2304B,10:2b:aa:51:f8:ab,172.20.220.98,,,iCX,2304B,MVM783,2304,no,
-2304B,10:2b:aa:51:fc:bb,10:2b:aa:51:fc:bc,2026-08-07 09:06:29,0.01,,,,Not in mDNS,,iCX,2304B,MVM783,2304,no,
+2304B,10:2b:aa:51:fc:bb,10:2b:aa:51:fc:bc,2026-08-07 09:06:29,0.01,2304B,10:2b:aa:51:fc:bc,172.20.194.181,,,iCX,2304B,MVM783,2304,no,
 ,,,,,2304A,32:bc:cb:d2:b0:f3,172.20.218.22,Stale MAC (randomized),,mDNS only,2304A,MVM783,2304,no,
 ,,,,,2304B,56:75:96:a2:26:2c,172.20.208.181,Stale MAC (randomized),,mDNS only,2304B,MVM783,2304,no,
 ,,,,,2304B,f2:6f:a7:8a:ec:d2,172.20.213.84,Stale MAC (randomized),,mDNS only,2304B,MVM783,2304,no,
