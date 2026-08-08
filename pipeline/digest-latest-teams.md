@@ -1,4 +1,4 @@
-(Claude) Vacatia 3-site iCX watch, 16:00Z to 20:00Z. 0 sweep windows banked.
+(Claude) Vacatia 3-site iCX watch, 20:00Z to 00:00Z. 0 sweep windows banked.
 
 - **MVM784 The Berkley** — NO DATA: no windows banked in this period
 
