@@ -5362,7 +5362,7 @@ icx_label,ethernet_mac,wifi_mac_derived,last_seen_icx,days_since,mdns_label,mdns
 61005B,10:2b:aa:51:66:4e,10:2b:aa:51:66:4f,2026-08-07 09:03:47,0.01,61005B,10:2b:aa:51:66:4f,172.20.221.37,,,iCX,61005B,MVM783,61005B,no,
 ,,,,,61005B,be:43:c8:69:12:5b,172.20.193.186,Stale MAC (randomized),,mDNS only,61005B,MVM783,61005B,no,
 ,,,,,61005B,5a:9b:a5:37:77:3c,172.20.209.89,Stale MAC (randomized),,mDNS only,61005B,MVM783,61005B,no,
-61006A,64:18:df:73:e2:87,64:18:df:73:e2:88,2026-08-07 09:09:29,0.0,,,,Not in mDNS,,iCX,61006A,MVM783,61006A,no,
+61006A,64:18:df:73:e2:87,64:18:df:73:e2:88,2026-08-07 09:09:29,0.0,61006A,64:18:df:73:e2:88,172.20.203.117,,,iCX,61006A,MVM783,61006A,no,
 61006A,68:ab:a9:fe:f5:24,68:ab:a9:fe:f5:25,2026-08-07 09:00:53,0.01,61006A,68:ab:a9:fe:f5:25,172.20.217.65,,,iCX,61006A,MVM783,61006A,no,
 ,,,,,61006A,42:e3:6b:e3:9e:39,172.20.199.6,Stale MAC (randomized),,mDNS only,61006A,MVM783,61006A,no,
 ,,,,,61006A,2e:d2:df:aa:a2:8e,172.20.216.116,Stale MAC (randomized),,mDNS only,61006A,MVM783,61006A,no,
